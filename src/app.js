@@ -32,7 +32,7 @@ const T = React.createClass({
 		)
 	}
 })
-var courseURL = "https://www.youtube.com/watch?v=p4XTMvagQ2Q";
+var courseURL = "https://www.youtube.com/watch?v=4Z9KEBexzcM";
 var courseID = "p4XTMvagQ2Q"
 
 ReactDOM.render(
