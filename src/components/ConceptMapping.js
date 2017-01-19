@@ -1,5 +1,6 @@
 import vis from 'vis'
 import React from 'react'
+import ReactDOM from 'react-dom'
 import firebase from 'firebase'
 import {toArray, retrieveData} from '../utils'
 import {Row, Col, Button, Input, Dropdown, Menu, Icon} from 'antd'
@@ -14,10 +15,12 @@ import {Row, Col, Button, Input, Dropdown, Menu, Icon} from 'antd'
     	chosen:false,
     	shape: 'box'
     },
+    interaction:{hover:true},
   };
-  var nodes={};
-  var edges={};
- 
+  var nodes=[];
+  var edges=[];
+  var data={};
+  var network={};
 const ConceptMapping = React.createClass({
 	getInitialState: function(){
 		return {
@@ -31,6 +34,7 @@ const ConceptMapping = React.createClass({
       		EdgeSubmitDisabled:true,
       		edgeIcons: ["ellipsis","minus","arrow-right"],
       		edgeLabelValue:'',
+      		requests:[],
 		}
 	},
 	componentDidMount: function(){
@@ -41,17 +45,17 @@ const ConceptMapping = React.createClass({
 		nodes = retrieveData(snapshot.val(), 'id','label', 'level','id', 'word', 'level');
 		console.log(nodes)
 		nodes = new vis.DataSet(nodes);
-		
-		edges = new vis.DataSet([
-		    {from: 1, to: 3},
-		    {from: 1, to: 2},
-		    {from: 2, to: 4},
-		  ]);
-		var data={
+		this.updateMap();
+		this.setState({
+			concepts: snapshot.val(),
+		})
+	},
+	updateMap: function(){
+		data={
 			nodes: nodes,
 			edges: edges
 		}
-		var network = new vis.Network(this.container, data, options);
+		network = new vis.Network(this.container, data, options);
 		network.on("selectNode", (params) =>{
 	        var _ = this.state;
 	        var word = _.concepts[ params['nodes'][0] ]['word']
@@ -82,12 +86,34 @@ const ConceptMapping = React.createClass({
 	    network.on("hoverNode", function (params) {
 	        console.log('hoverNode Event:', params);
 	    });
+	    network.on("hoverEdge", function (params) {
+	        console.log('hoverEdge Event:', params);
+	    });
+	    network.on("selectEdge", (params)=>{
+			var edgeId = params['edges'][0];
+			console.log(edgeId)
+			var nodes = network.getConnectedNodes(edgeId);
+			var position = network.getPositions(nodes);
+			console.log(position)
+			var keys = Object.keys(position)
+			var node1 = network.canvasToDOM(position[keys[0]]);			
+			var node2 = network.canvasToDOM(position[keys[1]]);
+			var x = (node1.x+node2.x)/2;
+			var y = (node1.y+node2.y)/2;
+			console.log(x+' '+y)
+			
+			var request = {x: x, y: y, content: 'a reqest'}
+			var requests = this.state.requests;
+			requests.push(request)
+			this.setState({
+				requests: requests,
+			})
+			console.log(requests)
+	    });
 		this.setState({
-			concepts: snapshot.val(),
 			data: data,
 			network: network
 		})
-
 	},
 	addEdge: function(when){
 		if(when=='start'){
@@ -103,29 +129,30 @@ const ConceptMapping = React.createClass({
 			var edgelabel = this.state.edgeLabelValue;
 			try {
 				if(edgetype=='ellipsis'){
-					edges.add({
-	                    id: Math.floor((Math.random() * 100) + 1),
+					edges.push({
+	                    id: Math.floor((Math.random() * 1000) + 1),
 	                    from: this.state.firstNode.nodes[0],
 	                    to: this.state.secondNode.nodes[0],
 	                    dashes: true,
 	                    label: edgelabel,
                		});
 				}else if(edgetype=='arrow-right'){
-					edges.add({
-	                    id: Math.floor((Math.random() * 100) + 1),
+					edges.push({
+	                    id: Math.floor((Math.random() * 1000) + 1),
 	                    from: this.state.firstNode.nodes[0],
 	                    to: this.state.secondNode.nodes[0],
 	                    arrows: 'to',
 	                    label: edgelabel,
 	                });
 				}else {
-					edges.add({
-	                    id: Math.floor((Math.random() * 100) + 1),
+					edges.push({
+	                    id: Math.floor((Math.random() * 1000) + 1),
 	                    from: this.state.firstNode.nodes[0],
 	                    to: this.state.secondNode.nodes[0],
 	                    label: edgelabel,
 	                });
-				} 
+				}
+				this.setState({edges: edges})
             }
             catch (err) {
                 alert(err);
@@ -139,6 +166,7 @@ const ConceptMapping = React.createClass({
             	edgeLabelValue:'',
             	mode:"Nomal",
             })
+            this.updateMap();
 		}
 	},
 	handleMenuClick: function(e){
@@ -174,10 +202,18 @@ const ConceptMapping = React.createClass({
 					<Col span={6}><Input addonBefore="relation" onChange={(e)=>this.handleEdgeLabelValueChange(e)} placeholder={"the derected relation between two nodes"} disabled={_.EdgeInputDisabled2} value={_.edgeLabelValue}/></Col>
 					<Col span={2}><Button onClick={()=>this.addEdge('finish')} htmlType='submit' disabled={_.EdgeSubmitDisabled}>Finish</Button></Col>
 				</Row>
-				<div ref={container=>{this.container = container}}></div> 
+				<div ref={container=>{this.container = container}}>
+				{_.requests.map((request,index)=>{
+					console.log(request.x)
+					return (
+						<div style={{left: request.x, top: request.y, xIndex: 2, position: 'relative'}}>
+							<Icon type="exclamation-circle" style={{color: 'red', width: 80}}/>
+						</div>
+					)
+				})}
+				</div> 
 			</div>
 			)
 	}
-
 })
 export default ConceptMapping

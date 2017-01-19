@@ -20,15 +20,14 @@ messagingSenderId: "311008823460"
 };
 
 firebase.initializeApp(config);
-
 //UI template
 const T = React.createClass({
 	render(){
 		return (
 		 <Layout>
-		    <Header>Header</Header>
+		    <Header></Header>
 		    <Content style={{ padding: '50px 50px' }}>{this.props.children}</Content>
-		    <Footer>Footer</Footer>
+		    <Footer></Footer>
 		  </Layout>
 		)
 	}
@@ -39,7 +38,7 @@ var courseID = "p4XTMvagQ2Q"
 ReactDOM.render(
 	<Router history={browserHistory}>
     <Route patch="/" component={T}>
-        <IndexRoute component={IndexView}/>
+        <IndexRoute component={conceptExtraction}/>
         <Route courseURL={courseURL} courseID={courseID} path='conceptExtraction' component={conceptExtraction} />
         <Route courseURL={courseURL} courseID={courseID} path='conceptAggregation' component={conceptAggregation} />
         <Route courseURL={courseURL} courseID={courseID} path='conceptMapping' component={conceptMapping} />

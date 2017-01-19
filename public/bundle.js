@@ -63,7 +63,7 @@
 /******/ 	}
 
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "765cf1ac9da251c5ef6a"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "a67f6262b410fa7be844"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
 
@@ -655,18 +655,17 @@
 	};
 
 	firebase.initializeApp(config);
-
 	//UI template
 	var T = _react2.default.createClass({
 		displayName: 'T',
 		render: function render() {
-			return _react2.default.createElement(_layout2.default, null, _react2.default.createElement(Header, null, 'Header'), _react2.default.createElement(Content, { style: { padding: '50px 50px' } }, this.props.children), _react2.default.createElement(Footer, null, 'Footer'));
+			return _react2.default.createElement(_layout2.default, null, _react2.default.createElement(Header, null), _react2.default.createElement(Content, { style: { padding: '50px 50px' } }, this.props.children), _react2.default.createElement(Footer, null));
 		}
 	});
 	var courseURL = "https://www.youtube.com/watch?v=p4XTMvagQ2Q";
 	var courseID = "p4XTMvagQ2Q";
 
-	_reactDom2.default.render(_react2.default.createElement(_reactRouter.Router, { history: _reactRouter.browserHistory }, _react2.default.createElement(_reactRouter.Route, { patch: '/', component: T }, _react2.default.createElement(_reactRouter.IndexRoute, { component: _IndexView2.default }), _react2.default.createElement(_reactRouter.Route, { courseURL: courseURL, courseID: courseID, path: 'conceptExtraction', component: _ConceptExtraction2.default }), _react2.default.createElement(_reactRouter.Route, { courseURL: courseURL, courseID: courseID, path: 'conceptAggregation', component: _ConceptAggregation2.default }), _react2.default.createElement(_reactRouter.Route, { courseURL: courseURL, courseID: courseID, path: 'conceptMapping', component: _ConceptMapping2.default }), _react2.default.createElement(_reactRouter.Route, { path: '*', component: _NotFoundView2.default }))), document.getElementById('container'));
+	_reactDom2.default.render(_react2.default.createElement(_reactRouter.Router, { history: _reactRouter.browserHistory }, _react2.default.createElement(_reactRouter.Route, { patch: '/', component: T }, _react2.default.createElement(_reactRouter.IndexRoute, { component: _ConceptExtraction2.default }), _react2.default.createElement(_reactRouter.Route, { courseURL: courseURL, courseID: courseID, path: 'conceptExtraction', component: _ConceptExtraction2.default }), _react2.default.createElement(_reactRouter.Route, { courseURL: courseURL, courseID: courseID, path: 'conceptAggregation', component: _ConceptAggregation2.default }), _react2.default.createElement(_reactRouter.Route, { courseURL: courseURL, courseID: courseID, path: 'conceptMapping', component: _ConceptMapping2.default }), _react2.default.createElement(_reactRouter.Route, { path: '*', component: _NotFoundView2.default }))), document.getElementById('container'));
 
 /***/ },
 /* 1 */,
@@ -30079,13 +30078,19 @@
 		value: true
 	});
 
-	var _style3 = __webpack_require__(369);
+	var _style4 = __webpack_require__(369);
 
 	var _row = __webpack_require__(372);
 
 	var _row2 = _interopRequireDefault(_row);
 
-	var _style4 = __webpack_require__(376);
+	var _style5 = __webpack_require__(394);
+
+	var _button = __webpack_require__(397);
+
+	var _button2 = _interopRequireDefault(_button);
+
+	var _style6 = __webpack_require__(376);
 
 	var _col = __webpack_require__(377);
 
@@ -30115,9 +30120,16 @@
 		jumpToTime: function jumpToTime(time) {
 			this.refs.player.jumpToTime(time);
 		},
+		gotoConceptAggregation: function gotoConceptAggregation() {
+			window.location.assign('/conceptAggregation');
+		},
 		render: function render() {
+			var _this = this;
+
 			console.log(this.props.route.courseID);
-			return _react2.default.createElement(_row2.default, null, _react2.default.createElement(_col2.default, { span: 16 }, _react2.default.createElement(_VideoPlayer2.default, { courseURL: this.props.route.courseURL, controls: 1, width: 854, height: 480, ref: 'player' })), _react2.default.createElement(_col2.default, { span: 8 }, _react2.default.createElement(_InputConcept2.default, { courseID: this.props.route.courseID, getPlayedTime: this.getPlayedTime, jumpToTime: this.jumpToTime })));
+			return _react2.default.createElement(_row2.default, null, _react2.default.createElement(_col2.default, { span: 16 }, _react2.default.createElement(_VideoPlayer2.default, { courseURL: this.props.route.courseURL, controls: true, width: 854, height: 480, ref: 'player' })), _react2.default.createElement(_col2.default, { span: 8 }, _react2.default.createElement(_InputConcept2.default, { courseID: this.props.route.courseID, getPlayedTime: this.getPlayedTime, jumpToTime: this.jumpToTime }), _react2.default.createElement(_button2.default, { type: 'primary', style: { marginTop: 10 }, onClick: function onClick() {
+					return _this.gotoConceptAggregation();
+				} }, ' Start concept mapping')));
 		}
 	});
 	exports.default = ConceptExtraction;
@@ -32722,11 +32734,12 @@
 		},
 		handleConceptAdd: function handleConceptAdd() {
 			var time = this.state.videoPlayerTime();
-			this.fire.push({
+			var key = this.fire.push({
 				word: this.state.conceptInputValue,
 				played: time.played,
 				time: time.duration
-			});
+			}).key;
+			firebase.database().ref(this.state.courseID + "/_concepts/" + key).update({ id: key });
 			this.setState({ conceptInputValue: '' });
 		},
 		handleConceptInputVlueChange: function handleConceptInputVlueChange(e) {
@@ -34260,7 +34273,7 @@
 	        } }, concept.word);
 	    })), _react2.default.createElement(_slider2.default, { value: this.state.sliderValue, onChange: this.handleSliderChanged, tipFormatter: this.showMark, marks: this.state.marks, min: 0, max: 1, step: 0.01 }), _react2.default.createElement(_VideoPlayer2.default, { ref: function ref(player) {
 	        _this2.player = player;
-	      }, playing: false, courseURL: this.state.courseURL, width: 640, height: 390, controls: 0 })));
+	      }, playing: false, courseURL: this.state.courseURL, width: 640, height: 390, controls: false })));
 	  }
 	});
 	exports.default = ConceptAggregation;
@@ -42126,6 +42139,10 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactDom = __webpack_require__(161);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
 	var _firebase = __webpack_require__(307);
 
 	var _firebase2 = _interopRequireDefault(_firebase);
@@ -42145,11 +42162,13 @@
 		nodes: {
 			chosen: false,
 			shape: 'box'
-		}
+		},
+		interaction: { hover: true }
 	};
-	var nodes = {};
-	var edges = {};
-
+	var nodes = [];
+	var edges = [];
+	var data = {};
+	var network = {};
 	var ConceptMapping = _react2.default.createClass({
 		displayName: 'ConceptMapping',
 
@@ -42164,7 +42183,8 @@
 				EdgeInputDisabled2: true,
 				EdgeSubmitDisabled: true,
 				edgeIcons: ["ellipsis", "minus", "arrow-right"],
-				edgeLabelValue: ''
+				edgeLabelValue: '',
+				requests: []
 			};
 		},
 		componentDidMount: function componentDidMount() {
@@ -42172,18 +42192,22 @@
 			this.fire.on('value', this.updateConcept);
 		},
 		updateConcept: function updateConcept(snapshot) {
-			var _this = this;
-
 			nodes = (0, _utils.retrieveData)(snapshot.val(), 'id', 'label', 'level', 'id', 'word', 'level');
 			console.log(nodes);
 			nodes = new _vis2.default.DataSet(nodes);
+			this.updateMap();
+			this.setState({
+				concepts: snapshot.val()
+			});
+		},
+		updateMap: function updateMap() {
+			var _this = this;
 
-			edges = new _vis2.default.DataSet([{ from: 1, to: 3 }, { from: 1, to: 2 }, { from: 2, to: 4 }]);
-			var data = {
+			data = {
 				nodes: nodes,
 				edges: edges
 			};
-			var network = new _vis2.default.Network(this.container, data, options);
+			network = new _vis2.default.Network(this.container, data, options);
 			network.on("selectNode", function (params) {
 				var _ = _this.state;
 				var word = _.concepts[params['nodes'][0]]['word'];
@@ -42214,8 +42238,31 @@
 			network.on("hoverNode", function (params) {
 				console.log('hoverNode Event:', params);
 			});
+			network.on("hoverEdge", function (params) {
+				console.log('hoverEdge Event:', params);
+			});
+			network.on("selectEdge", function (params) {
+				var edgeId = params['edges'][0];
+				console.log(edgeId);
+				var nodes = network.getConnectedNodes(edgeId);
+				var position = network.getPositions(nodes);
+				console.log(position);
+				var keys = Object.keys(position);
+				var node1 = network.canvasToDOM(position[keys[0]]);
+				var node2 = network.canvasToDOM(position[keys[1]]);
+				var x = (node1.x + node2.x) / 2;
+				var y = (node1.y + node2.y) / 2;
+				console.log(x + ' ' + y);
+
+				var request = { x: x, y: y, content: 'a reqest' };
+				var requests = _this.state.requests;
+				requests.push(request);
+				_this.setState({
+					requests: requests
+				});
+				console.log(requests);
+			});
 			this.setState({
-				concepts: snapshot.val(),
 				data: data,
 				network: network
 			});
@@ -42233,29 +42280,30 @@
 				var edgelabel = this.state.edgeLabelValue;
 				try {
 					if (edgetype == 'ellipsis') {
-						edges.add({
-							id: Math.floor(Math.random() * 100 + 1),
+						edges.push({
+							id: Math.floor(Math.random() * 1000 + 1),
 							from: this.state.firstNode.nodes[0],
 							to: this.state.secondNode.nodes[0],
 							dashes: true,
 							label: edgelabel
 						});
 					} else if (edgetype == 'arrow-right') {
-						edges.add({
-							id: Math.floor(Math.random() * 100 + 1),
+						edges.push({
+							id: Math.floor(Math.random() * 1000 + 1),
 							from: this.state.firstNode.nodes[0],
 							to: this.state.secondNode.nodes[0],
 							arrows: 'to',
 							label: edgelabel
 						});
 					} else {
-						edges.add({
-							id: Math.floor(Math.random() * 100 + 1),
+						edges.push({
+							id: Math.floor(Math.random() * 1000 + 1),
 							from: this.state.firstNode.nodes[0],
 							to: this.state.secondNode.nodes[0],
 							label: edgelabel
 						});
 					}
+					this.setState({ edges: edges });
 				} catch (err) {
 					alert(err);
 				}
@@ -42268,6 +42316,7 @@
 					edgeLabelValue: '',
 					mode: "Nomal"
 				});
+				this.updateMap();
 			}
 		},
 		handleMenuClick: function handleMenuClick(e) {
@@ -42306,9 +42355,11 @@
 					return _this2.addEdge('finish');
 				}, htmlType: 'submit', disabled: _.EdgeSubmitDisabled }, 'Finish'))), _react2.default.createElement('div', { ref: function ref(container) {
 					_this2.container = container;
-				} }));
+				} }, _.requests.map(function (request, index) {
+				console.log(request.x);
+				return _react2.default.createElement('div', { style: { left: request.x, top: request.y, xIndex: 2, position: 'relative' } }, _react2.default.createElement(_icon2.default, { type: 'exclamation-circle', style: { color: 'red', width: 80 } }));
+			})));
 		}
-
 	});
 	exports.default = ConceptMapping;
 

@@ -27,11 +27,12 @@ const InputConcept = React.createClass({
 	},
 	handleConceptAdd(){
 		const time = this.state.videoPlayerTime();
-		this.fire.push({
+		var key = this.fire.push({
 			word: this.state.conceptInputValue,
 			played: time.played,
 			time: time.duration
-		})
+		}).key;
+		firebase.database().ref(this.state.courseID+"/_concepts/"+key).update({id: key})
 		this.setState({conceptInputValue:''})
 	},
 	handleConceptInputVlueChange(e){

@@ -117,7 +117,7 @@ const ConceptAggregation = React.createClass({
 	        })}
 	        </Card>
 	        <Slider value={this.state.sliderValue} onChange={this.handleSliderChanged} tipFormatter={this.showMark} marks={this.state.marks} min={0} max={1} step={0.01}/>
-	        <VideoPlayer ref={player => { this.player=player }} playing={false} courseURL={this.state.courseURL} width={640} height={390} controls={0}/>
+	        <VideoPlayer ref={player => { this.player=player }} playing={false} courseURL={this.state.courseURL} width={640} height={390} controls={false}/>
 	      	</Col>
 	      	
     	</Row>
