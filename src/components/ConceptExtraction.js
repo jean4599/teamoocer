@@ -10,8 +10,10 @@ const ConceptExtraction = React.createClass ({
 	jumpToTime(time){
 		this.refs.player.jumpToTime(time);
 	},
-	gotoConceptAggregation(){
-		window.location.assign('/conceptAggregation')
+	conceptAggregation(){
+		this.inputConcept.handleConceptAggreagate(
+			()=>{window.location.assign('/conceptMapping')}
+			);
 	},
 	render(){
 		console.log(this.props.route.courseID) 
@@ -19,8 +21,8 @@ const ConceptExtraction = React.createClass ({
 			<Row>
 				<Col span={16}><VideoPlayer courseURL={this.props.route.courseURL} controls={true} width={854} height={480} ref='player'/></Col>
 				<Col span={8}>
-					<InputConcept courseID={this.props.route.courseID} getPlayedTime={this.getPlayedTime} jumpToTime={this.jumpToTime}/>
-					<Button type='primary' style={{marginTop: 10}} onClick={()=>this.gotoConceptAggregation()}> Start concept mapping</Button>
+					<InputConcept ref={c=>{this.inputConcept=c}} courseID={this.props.route.courseID} getPlayedTime={this.getPlayedTime} jumpToTime={this.jumpToTime}/>
+					<Button type='primary' style={{marginTop: 10}} onClick={()=>this.conceptAggregation()}> Start concept mapping</Button>
 				</Col>
 			</Row>
 			)

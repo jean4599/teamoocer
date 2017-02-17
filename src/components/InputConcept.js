@@ -1,46 +1,66 @@
 import React from 'react'
 import * as firebase from 'firebase'
 import { Input, Timeline, Col, Row, Button } from 'antd'
-import {toArray} from '../utils'
+import {toArray, getCookie} from '../utils'
 import Duration from './Duration'
 
 const InputConcept = React.createClass({
-	getInitialState(){
+	getInitialState: function(){
 		return {
 			concepts:[],
 			courseID: this.props.courseID,
 			conceptInputValue:'',
 			videoPlayerTime: this.props.getPlayedTime,
 			jumpToTime: this.props.jumpToTime,
+			user: getCookie('uid')
 		}
 	},
-	componentDidMount(){
-		this.fire = firebase.database().ref(this.state.courseID+"/_concepts");
+	componentDidMount: function(){
+		this.fire = firebase.database().ref(this.state.courseID+"/_concepts/"+this.state.user);
 		this.fire.on('value', this.updateConcepts);
 	},
-	updateConcepts(snapshot){
+	updateConcepts: function(snapshot){
 		var conceptsArray = toArray(snapshot.val());
 		this.setState({
 			concepts: conceptsArray
 		})
 		console.log(this.state.concepts);
 	},
-	handleConceptAdd(){
+	handleConceptAdd: function(){
 		const time = this.state.videoPlayerTime();
 		var key = this.fire.push({
 			word: this.state.conceptInputValue,
 			played: time.played,
 			time: time.duration
 		}).key;
-		firebase.database().ref(this.state.courseID+"/_concepts/"+key).update({id: key})
+		firebase.database().ref(this.state.courseID+"/_concepts/"+this.state.user+'/'+key).update({id: key})
 		this.setState({conceptInputValue:''})
 	},
-	handleConceptInputVlueChange(e){
+	handleConceptAggreagate: function(callback){
+		this.state.concepts.map((concept,index)=>{
+			var ref = firebase.database().ref(this.state.courseID+"/_network/_concepts/"+concept['word']);
+			ref.once('value')
+			  .then(function(snapshot) {
+			    // handle read data.
+			    var c = snapshot.val();
+			    if(c) {
+			    	console.log(c.count)
+			    	ref.update({count: c.count+1})
+			    	callback()
+			    }
+			    else {
+			    	ref.update({count: 1, id:concept['word']})
+			    	callback()
+			    }
+			  });
+		})
+	},
+	handleConceptInputVlueChange: function(e){
 		this.setState({
 			conceptInputValue: e.target.value
 		})
 	},
-	render(){
+	render: function(){
 		return (
 			<div>
 				<Timeline>

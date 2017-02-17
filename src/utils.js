@@ -4,7 +4,7 @@ export function toArray(obj) {
 
   var arr = Object.keys(obj).map(function (key, index) { 
     var result  = clone(obj[key]);
-    result.key = key
+    if(typeof(result)==Object)result.key = key
     return result; 
   });
   return arr
@@ -22,27 +22,38 @@ export function getMarks(obj, getkeys, values){
   })
   return result
 }
-export function retrieveData(obj, key1, key2, key3, val1, val2, val3){
-  var result = Object.keys(obj).map(function(key, index){
-    var r = {};
-    if(key1!=null){
-      var value1 = obj[key][val1];
-      r[key1] = value1;
-    }
-    if(key2!=null){
-      var value2 = obj[key][val2];
-      r[key2] = value2;
-
-    }
-    if(key3!=null){
-      var value3 = obj[key][val3];
-      r[key3] = value3;
-    }
-    return r
-  })
-  return result
+export function retrieveData(obj, froms, tos){
+  if(obj && froms && tos && froms.length==tos.length){
+      var result = Object.keys(obj).map(function(key, index){
+      var r = {};
+      for(var i=0; i<froms.length; i++){
+        r[tos[i]] = obj[key][froms[i]]
+      }
+      return r
+    })
+    return result
+  } 
 }
-
+export function setCookie(cname,cvalue,exdays) {
+          var d = new Date();
+          d.setTime(d.getTime() + (exdays*24*60*60*1000));
+          var expires = "expires=" + d.toGMTString();
+          document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+      }
+export function getCookie(cname) {
+      var name = cname + "=";
+      var ca = document.cookie.split(';');
+      for(var i = 0; i <ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') {
+              c = c.substring(1);
+          }
+          if (c.indexOf(name) == 0) {
+              return c.substring(name.length,c.length);
+          }
+      }
+      return "";
+    }
 function clone(obj) {
     if (null == obj || "object" != typeof obj) return obj;
     var copy = obj.constructor();

@@ -8,7 +8,10 @@ import conceptMapping from './components/ConceptMapping'
 import IndexView from './components/IndexView'
 import NotFoundView from './components/NotFoundView'
 import { Layout } from 'antd';
+import style from './app.css'
+
 const { Header, Footer, Sider, Content } = Layout;
+
 
 //Initialize firebase
 var config = {
@@ -26,8 +29,7 @@ const T = React.createClass({
 		return (
 		 <Layout>
 		    <Header></Header>
-		    <Content style={{ padding: '50px 50px' }}>{this.props.children}</Content>
-		    <Footer></Footer>
+		    <Content style={{ padding: '50px 50px', backgroundColor: 'white' }}>{this.props.children}</Content>
 		  </Layout>
 		)
 	}
@@ -37,8 +39,8 @@ var courseID = "p4XTMvagQ2Q"
 
 ReactDOM.render(
 	<Router history={browserHistory}>
-    <Route patch="/" component={T}>
-        <IndexRoute component={conceptExtraction}/>
+    <Route path="/" component={T}>
+        <IndexRoute component={IndexView}/>
         <Route courseURL={courseURL} courseID={courseID} path='conceptExtraction' component={conceptExtraction} />
         <Route courseURL={courseURL} courseID={courseID} path='conceptAggregation' component={conceptAggregation} />
         <Route courseURL={courseURL} courseID={courseID} path='conceptMapping' component={conceptMapping} />
