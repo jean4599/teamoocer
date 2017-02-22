@@ -6,6 +6,7 @@ import conceptExtraction from './components/ConceptExtraction'
 import conceptAggregation from './components/ConceptAggregation'
 import conceptMapping from './components/ConceptMapping'
 import IndexView from './components/IndexView'
+import Main from './components/Main'
 import NotFoundView from './components/NotFoundView'
 import { Layout } from 'antd';
 import style from './app.css'
@@ -29,7 +30,7 @@ const T = React.createClass({
 		return (
 		 <Layout>
 		    <Header></Header>
-		    <Content style={{ padding: '50px 50px', backgroundColor: 'white' }}>{this.props.children}</Content>
+		    <Content style={{ backgroundColor: 'white' }}>{this.props.children}</Content>
 		  </Layout>
 		)
 	}
@@ -41,9 +42,10 @@ ReactDOM.render(
 	<Router history={browserHistory}>
     <Route path="/" component={T}>
         <IndexRoute component={IndexView}/>
-        <Route courseURL={courseURL} courseID={courseID} path='conceptExtraction' component={conceptExtraction} />
-        <Route courseURL={courseURL} courseID={courseID} path='conceptAggregation' component={conceptAggregation} />
-        <Route courseURL={courseURL} courseID={courseID} path='conceptMapping' component={conceptMapping} />
+        <Route courseURL={courseURL} path='/:courseID' component={Main} />
+        // <Route courseURL={courseURL} courseID={courseID} path='conceptExtraction' component={conceptExtraction} />
+        // <Route courseURL={courseURL} courseID={courseID} path='conceptAggregation' component={conceptAggregation} />
+        // <Route courseURL={courseURL} courseID={courseID} path='conceptMapping' component={conceptMapping} />
         <Route path="*" component={NotFoundView}/>
     </Route>
   </Router>,

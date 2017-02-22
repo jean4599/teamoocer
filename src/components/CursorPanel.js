@@ -28,9 +28,9 @@ const CursorPanel = React.createClass({
 			this.setState({cursors: toArray(result)})
 		}
 	},
-	handleMouseMove:function(x, y){
-		var offsetX = x-370;
-		var offsetY = y-150
+	handleMouseMove:function(x, y){         
+		var offsetX = x-30;
+		var offsetY = y-30;
 		this.fire.child(this.state.user).update({cursorX: offsetX, cursorY: offsetY})
 	},
   	render: function() {

@@ -3,14 +3,16 @@ import Network from './Network'
 import NoticeBoard from './NoticeBoard'
 import CursorPanel from './CursorPanel'
 import ChatRoom from './ChatRoom'
-import {Row, Col} from 'antd'
+import ConceptMapInformation from './ConceptMapInformation'
+import {Row, Col, Button, Modal} from 'antd'
 import {getCookie} from '../utils'
+import ReactCursorPosition from 'react-cursor-position'
 
 const ConceptMapping = React.createClass({
 	getInitialState: function(){
 		return{
-				courseID: this.props.route.courseID,
-      			courseURL: this.props.route.courseURL,
+				courseID: this.props.courseID,
+      			courseURL: this.props.courseURL,
       			user: getCookie('uid')			
 		}
 	},
@@ -18,17 +20,27 @@ const ConceptMapping = React.createClass({
 		this.noticeBoard.addComfirmLinkPhrase(edgeID, this.state.user);
 	},
 	handleMouseMove: function(e){
-		e.persist()
-		this.cursorPanel.handleMouseMove(e.clientX, e.clientY)
+		// e.persist()
+		// this.cursorPanel.handleMouseMove(e.clientX, e.clientY)
+		this.cursorPanel.handleMouseMove(e.x, e.y)
 	},
 	changeEdgeToSolidLine: function(edgeID){
 		this.network.changeEdgeToSolidLine(edgeID)
+	},
+	showInformation: function(){
+		 Modal.info({
+		    title: 'How to build a concept map?',
+		    content: (
+		      <ConceptMapInformation />
+		    ),
+		    onOk() {},
+		 });
 	},
 	render: function(){
 		var _ = this.state;
 		return(
 			<div>
-				<Row>
+				<Row style={{height:'100%'}}>
 					<Col span={5}>
 						<NoticeBoard ref={board=>{this.noticeBoard=board}} 
 							courseID={_.courseID}
@@ -36,8 +48,10 @@ const ConceptMapping = React.createClass({
 							changeEdgeToSolidLine={this.changeEdgeToSolidLine}/>
 					</Col>
 					<Col span={15}>
-						<div id='network-container'
-							onMouseMove={(e)=>{this.handleMouseMove(e)}}>
+						<ReactCursorPosition id='network-container'
+							// onMouseMove={(e)=>{this.handleMouseMove(e)}}
+							onCursorPositionChanged={(e)=>{this.handleMouseMove(e)}}
+							>
 
 							<CursorPanel 
 								ref={panel=>{this.cursorPanel = panel}}
@@ -48,7 +62,7 @@ const ConceptMapping = React.createClass({
 								courseURL={_.courseURL} 
 								courseID={_.courseID}
 								sendLinkPhraseNotice={this.sendLinkPhraseNotice} />
-						</div>
+						</ReactCursorPosition>
 					</Col>
 					<Col span={4}>
 						<ChatRoom

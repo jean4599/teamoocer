@@ -81,7 +81,7 @@ const ComfirmLinkPhrase = React.createClass({
 	    return (
 	      <Card>
 	      	<Row>
-	      		<Col id='comfirm-title'>Do you think this is a proper link phrase?</Col>
+	      		<Col span={24} id='comfirm-title'>Do you think this is a proper link phrase?</Col>
 	      	</Row>
 	      	<Row className='comfirm-graph-container graph'>
 	      		<Col span={6} className='comfirm-graph'> <p className='node right' /> </Col>

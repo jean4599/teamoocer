@@ -4,25 +4,33 @@ import VideoPlayer from './VideoPlayer'
 import InputConcept from './InputConcept'
 
 const ConceptExtraction = React.createClass ({
-	getPlayedTime(){
+	getInitialState: function(){
+		return{
+			courseID: this.props.courseID,
+			courseURL: this.props.courseURL,
+		}
+	},
+	getPlayedTime: function(){
 		return this.refs.player.getPlayedTime();
 	},
-	jumpToTime(time){
+	jumpToTime: function(time){
 		this.refs.player.jumpToTime(time);
 	},
-	conceptAggregation(){
-		this.inputConcept.handleConceptAggreagate(
-			()=>{window.location.assign('/conceptMapping')}
-			);
+	conceptAggregation: function(){
+		// this.inputConcept.handleConceptAggreagate(
+		// 	()=>{window.location.assign('/conceptMapping')}
+		// 	);
+		this.inputConcept.handleConceptAggreagate();
 	},
-	render(){
-		console.log(this.props.route.courseID) 
+	render: function(){
+		var _ = this.state;
+		console.log(_.courseID) 
 		return(
 			<Row>
-				<Col span={16}><VideoPlayer courseURL={this.props.route.courseURL} controls={true} width={854} height={480} ref='player'/></Col>
+				<Col span={16}><VideoPlayer courseURL={_.courseURL} controls={true} width={854} height={480} ref='player'/></Col>
 				<Col span={8}>
-					<InputConcept ref={c=>{this.inputConcept=c}} courseID={this.props.route.courseID} getPlayedTime={this.getPlayedTime} jumpToTime={this.jumpToTime}/>
-					<Button type='primary' style={{marginTop: 10}} onClick={()=>this.conceptAggregation()}> Start concept mapping</Button>
+					<InputConcept ref={c=>{this.inputConcept=c}} courseID={_.courseID} getPlayedTime={this.getPlayedTime} jumpToTime={this.jumpToTime}/>
+					<Button type='primary' style={{marginTop: 10}} onClick={()=>this.conceptAggregation()}> Save </Button>
 				</Col>
 			</Row>
 			)

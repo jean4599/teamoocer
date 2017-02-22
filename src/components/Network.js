@@ -71,6 +71,21 @@ const ConceptMapping = React.createClass({
 		            _this.setState({displayAddNodePopup:'block', newNodeData: data})
 		          },
 		          editNode: function (data, callback) {
+		          	console.log(data)
+		          },
+		          deleteNode: function(data, callback){
+		            var node = data.nodes[0]
+		            if(node){
+		            	console.log('delete ' + node);
+		           		_this.nodefire.child(node).remove()    	
+		            }
+		          },
+		          deleteEdge: function(data, callback){
+		            var edge = data.edges[0]
+		            if(edge){
+		            	console.log('delete ' + edge);
+		           		_this.edgefire.child(edge).remove()    	
+	            	}
 		          },
 		          addEdge: function (data, callback) {
 		            if (data.from == data.to) {

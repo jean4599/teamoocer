@@ -56,8 +56,9 @@ const ChatRoom = React.createClass({
 				<Input 
 					className='chat-input'
 	      			prefix={<Icon type="message" />} 
-	      			placeholder='other suggestion?' 
+	      			placeholder='I want to say...' 
 	      			value={_.inputMessage} 
+	      			size='large'
 	      			onPressEnter={()=>this.sendMesssage()}
 	      			onChange={(e)=>this.handleInputMessageChnage(e)} />
 			</Row>
