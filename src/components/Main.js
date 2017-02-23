@@ -51,9 +51,9 @@ const Main = React.createClass({
 
 			        <Element name="discussion" className="element">
 						<Link activeClass="active" onClick={this.scrollToTop} spy={true} smooth={true} offset={50} duration={500} >
-				          <Row style={{backgroundColor: '#e9e9e9', height: '15%'}} ><Col className='half-circle-down center' style={{backgroundColor: '#F25F5C'}}>Review video</Col></Row>
+				          <Row style={{backgroundColor: '#f7f7f7', height: '15%'}} ><Col className='half-circle-down center' style={{backgroundColor: '#79f7bc'}}>Review video</Col></Row>
 				        </Link>
-			        	<div style={{padding: '0 50', backgroundColor: '#e9e9e9', height: '90%' }}><ConceptMapping courseURL={this.state.courseURL} courseID={this.state.courseID}/></div>
+			        	<div style={{padding: '0 50', backgroundColor: '#f7f7f7', height: '90%' }}><ConceptMapping courseURL={this.state.courseURL} courseID={this.state.courseID}/></div>
 			        </Element>
 			        
 			        <Element name='tutorial' className='element'>
