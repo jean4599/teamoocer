@@ -7,7 +7,7 @@ import style from './style.css'
 const ComfirmLinkPhrase = React.createClass({
 	getInitialState: function(){
 		return{
-			linkID: this.props.linkID,
+			nodeID: this.props.nodeID,
 			user: this.props.user,
 			members: this.props.members,
 			courseID: this.props.courseID,
@@ -47,8 +47,8 @@ const ComfirmLinkPhrase = React.createClass({
 		var members = this.state.members;
 		var status=this.state.allComfirmStatus;
 		for(var i=0; i<members.length; i++){
-			console.log('check: '+members[i].uid+': status='+status[members[i].uid].comfirm)
-			if(!(status[members[i].uid].comfirm)) return false
+			console.log('check: '+members[i]+': status='+status[members[i]].comfirm)
+			if(!(status[members[i]].comfirm)) return false
 		}
 		return true
 	},

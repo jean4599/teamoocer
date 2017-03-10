@@ -13,8 +13,6 @@ const NormalLoginForm = Form.create()(React.createClass({
         //user has logged in!
         setCookie('userEmail', user['email'], 1)
         setCookie('uid', user['uid'], 1)
-
-        firebase.database().ref(_this.state.courseID+'/_members').push({uid: user['uid']})
         window.location.assign(_this.state.courseID)
       }
     });

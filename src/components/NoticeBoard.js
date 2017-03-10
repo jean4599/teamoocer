@@ -44,7 +44,7 @@ const NoticeBoard = React.createClass({
 		})
 		var i;
 		for (i=0; i<members.length; i++){
-			this.linkphraseFire.child(linkID).child(members[i]).update({
+			this.linkphraseFire.child(linkID).child(members[i].uid).update({
 				comfirm: false
 			})
 		}

@@ -63,7 +63,7 @@
 /******/ 	}
 
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "7572f860639d838326f2"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "e82e32d67b5b037ee5c2"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
 
@@ -32979,25 +32979,31 @@
 		value: true
 	});
 
-	var _style5 = __webpack_require__(370);
+	var _style6 = __webpack_require__(370);
 
 	var _row = __webpack_require__(373);
 
 	var _row2 = _interopRequireDefault(_row);
 
-	var _style6 = __webpack_require__(383);
+	var _style7 = __webpack_require__(377);
+
+	var _button = __webpack_require__(380);
+
+	var _button2 = _interopRequireDefault(_button);
+
+	var _style8 = __webpack_require__(383);
 
 	var _col = __webpack_require__(384);
 
 	var _col2 = _interopRequireDefault(_col);
 
-	var _style7 = __webpack_require__(401);
+	var _style9 = __webpack_require__(401);
 
 	var _input = __webpack_require__(404);
 
 	var _input2 = _interopRequireDefault(_input);
 
-	var _style8 = __webpack_require__(409);
+	var _style10 = __webpack_require__(409);
 
 	var _timeline = __webpack_require__(412);
 
@@ -33114,7 +33120,9 @@
 					} }, ' ', concept.word, ' ', _react2.default.createElement(_Duration2.default, { seconds: concept.time }));
 			})), _react2.default.createElement(_row2.default, null, _react2.default.createElement(_col2.default, { span: 20 }, _react2.default.createElement(_input2.default, { placeholder: 'New concept', onPressEnter: function onPressEnter() {
 					return _this2.handleConceptAdd();
-				}, value: this.state.conceptInputValue, onChange: this.handleConceptInputVlueChange }))));
+				}, value: this.state.conceptInputValue, onChange: this.handleConceptInputVlueChange })), _react2.default.createElement(_col2.default, { span: 4 }, _react2.default.createElement(_button2.default, { type: 'primary', onClick: function onClick() {
+					return _this2.handleConceptAdd();
+				} }, 'Add'))));
 		}
 	});
 	exports.default = InputConcept;
@@ -94768,7 +94776,7 @@
 			});
 			var i;
 			for (i = 0; i < members.length; i++) {
-				this.linkphraseFire.child(linkID).child(members[i]).update({
+				this.linkphraseFire.child(linkID).child(members[i].uid).update({
 					comfirm: false
 				});
 			}
@@ -94902,8 +94910,8 @@
 			var members = this.state.members;
 			var status = this.state.allComfirmStatus;
 			for (var i = 0; i < members.length; i++) {
-				console.log('check: ' + members[i] + ': status=' + status[members[i]].comfirm);
-				if (!status[members[i]].comfirm) return false;
+				console.log('check: ' + members[i].uid + ': status=' + status[members[i].uid].comfirm);
+				if (!status[members[i].uid].comfirm) return false;
 			}
 			return true;
 		},
@@ -96986,8 +96994,6 @@
 	        //user has logged in!
 	        (0, _utils.setCookie)('userEmail', user['email'], 1);
 	        (0, _utils.setCookie)('uid', user['uid'], 1);
-
-	        _firebase2.default.database().ref(_this.state.courseID + '/_members').push({ uid: user['uid'] });
 	        window.location.assign(_this.state.courseID);
 	      }
 	    });
