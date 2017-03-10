@@ -63,7 +63,7 @@
 /******/ 	}
 
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "400876f49a3e0d368898"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "0606cb95803ec9b1da98"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
 
@@ -30137,9 +30137,6 @@
 			this.refs.player.jumpToTime(time);
 		},
 		conceptAggregation: function conceptAggregation() {
-			// this.inputConcept.handleConceptAggreagate(
-			// 	()=>{window.location.assign('/conceptMapping')}
-			// 	);
 			this.inputConcept.handleConceptAggreagate();
 		},
 		render: function render() {
@@ -30151,7 +30148,7 @@
 					_this.inputConcept = c;
 				}, courseID: _.courseID, getPlayedTime: this.getPlayedTime, jumpToTime: this.jumpToTime }), _react2.default.createElement(_button2.default, { type: 'primary', style: { marginTop: 10 }, onClick: function onClick() {
 					return _this.conceptAggregation();
-				} }, ' Save ')));
+				} }, ' Share these concepts ')));
 		}
 	});
 	exports.default = ConceptExtraction;
@@ -33060,12 +33057,14 @@
 			this.fire = firebase.database().ref(this.state.courseID + "/_concepts/" + this.state.user);
 			this.fire.on('value', this.updateConcepts);
 		},
+		componentDidUpdate: function componentDidUpdate() {
+			this.conceptsContainer.scrollTop = this.conceptsContainer.scrollHeight;
+		},
 		updateConcepts: function updateConcepts(snapshot) {
 			var conceptsArray = (0, _utils.toArray)(snapshot.val());
 			this.setState({
 				concepts: conceptsArray
 			});
-			console.log(this.state.concepts);
 		},
 		handleConceptAdd: function handleConceptAdd() {
 			var time = this.state.videoPlayerTime();
@@ -33077,21 +33076,31 @@
 			firebase.database().ref(this.state.courseID + "/_concepts/" + this.state.user + '/' + key).update({ id: key });
 			this.setState({ conceptInputValue: '' });
 		},
-		handleConceptAggreagate: function handleConceptAggreagate(callback) {
+		handleConceptAggreagate: function handleConceptAggreagate() {
 			var _this = this;
 
+			var me = this.state.user;
 			this.state.concepts.map(function (concept, index) {
 				var ref = firebase.database().ref(_this.state.courseID + "/_network/_concepts/" + concept['word']);
 				ref.once('value').then(function (snapshot) {
 					// handle read data.
 					var c = snapshot.val();
 					if (c) {
-						console.log(c.count);
-						ref.update({ count: c.count + 1 });
-						callback();
+						//if someone has created this word
+						ref.child('_who').child(me).update({ count: 1 }).then(function () {
+							//add myself
+							//update the node color
+							ref.child('_who').once('value').then(function (snapshot) {
+								//check how many people
+								var people = (0, _utils.toArray)(snapshot.val());
+								var number = people.length;
+								ref.update({ color: (0, _utils.getGradColor)(number) });
+							});
+						});
 					} else {
-						ref.update({ count: 1, id: concept['word'] });
-						callback();
+						// if this is a new word
+						ref.update({ id: concept['word'] });
+						ref.child('_who').child(me).update({ count: 1 });
 					}
 				});
 			});
@@ -33104,8 +33113,10 @@
 		render: function render() {
 			var _this2 = this;
 
-			return _react2.default.createElement('div', null, _react2.default.createElement(_timeline2.default, null, this.state.concepts.map(function (concept, index) {
-				return _react2.default.createElement(_timeline2.default.Item, { style: { cursor: 'pointer' }, onClick: function onClick() {
+			return _react2.default.createElement('div', null, _react2.default.createElement('div', { ref: function ref(t) {
+					_this2.conceptsContainer = t;
+				}, style: { maxHeight: '80%', overflowY: 'scroll' } }, this.state.concepts.map(function (concept, index) {
+				return _react2.default.createElement(_timeline2.default.Item, { key: index, style: { cursor: 'pointer' }, onClick: function onClick() {
 						return _this2.state.jumpToTime(concept.played);
 					} }, ' ', concept.word, ' ', _react2.default.createElement(_Duration2.default, { seconds: concept.time }));
 			})), _react2.default.createElement(_row2.default, null, _react2.default.createElement(_col2.default, { span: 20 }, _react2.default.createElement(_input2.default, { placeholder: 'New concept', onPressEnter: function onPressEnter() {
@@ -34022,6 +34033,7 @@
 	exports.retrieveData = retrieveData;
 	exports.setCookie = setCookie;
 	exports.getCookie = getCookie;
+	exports.getGradColor = getGradColor;
 
 	var _react = __webpack_require__(123);
 
@@ -34030,6 +34042,8 @@
 	function _interopRequireDefault(obj) {
 	  return obj && obj.__esModule ? obj : { default: obj };
 	}
+
+	var GradColor = ['#C0FCD0', '#B1F0A1', '#A2E572', '#92DA43'];
 
 	function toArray(obj) {
 	  if (!obj) return [];
@@ -34085,6 +34099,9 @@
 	    }
 	  }
 	  return "";
+	}
+	function getGradColor(scale) {
+	  return GradColor[scale];
 	}
 	function clone(obj) {
 	  if (null == obj || "object" != (typeof obj === 'undefined' ? 'undefined' : _typeof(obj))) return obj;
@@ -42188,6 +42205,10 @@
 
 	var _ConceptMapInformation2 = _interopRequireDefault(_ConceptMapInformation);
 
+	var _MapGrid = __webpack_require__(597);
+
+	var _MapGrid2 = _interopRequireDefault(_MapGrid);
+
 	var _utils = __webpack_require__(415);
 
 	var _reactCursorPosition = __webpack_require__(528);
@@ -42226,6 +42247,12 @@
 				onOk: function onOk() {}
 			});
 		},
+		fitScreen: function fitScreen() {
+			this.network.fitScreen();
+		},
+		setMapView: function setMapView(x, y) {
+			this.cursorPanel.setMapView(x, y);
+		},
 		render: function render() {
 			var _this = this;
 
@@ -42240,7 +42267,7 @@
 				, onCursorPositionChanged: function onCursorPositionChanged(e) {
 					_this.handleMouseMove(e);
 				}
-			}, _react2.default.createElement(_CursorPanel2.default, {
+			}, _react2.default.createElement(_MapGrid2.default, null), _react2.default.createElement(_CursorPanel2.default, {
 				ref: function ref(panel) {
 					_this.cursorPanel = panel;
 				},
@@ -42251,7 +42278,8 @@
 				},
 				courseURL: _.courseURL,
 				courseID: _.courseID,
-				sendLinkPhraseNotice: this.sendLinkPhraseNotice }))), _react2.default.createElement(_col2.default, { span: 4 }, _react2.default.createElement(_ChatRoom2.default, {
+				sendLinkPhraseNotice: this.sendLinkPhraseNotice,
+				changeMapView: this.setMapView }))), _react2.default.createElement(_col2.default, { span: 4 }, _react2.default.createElement(_ChatRoom2.default, {
 				courseID: _.courseID,
 				user: _.user }))));
 		}
@@ -42329,11 +42357,14 @@
 		nodes: {
 			chosen: false,
 			shape: 'box',
-			color: '#ccffcc'
+			color: '#C0FCD0'
 		},
 		interaction: {
 			hover: true,
 			selectConnectedEdges: false
+		},
+		layout: {
+			randomSeed: 100
 		},
 		locale: 'en',
 		locales: {
@@ -42357,7 +42388,7 @@
 	var nodes = [];
 	var edges = [];
 	var data = {};
-	var network = {};
+	var network = null;
 
 	var ConceptMapping = _react2.default.createClass({
 		displayName: 'ConceptMapping',
@@ -42368,10 +42399,6 @@
 				courseURL: this.props.courseURL,
 				data: {},
 				mode: 'nomal',
-				EdgeInputDisabled1: true,
-				EdgeInputDisabled2: true,
-				EdgeSubmitDisabled: true,
-				edgeIcons: ["ellipsis", "minus", "arrow-right"],
 				edgeLabelValue: '',
 				requests: []
 			};
@@ -42388,20 +42415,16 @@
 				addNode: function addNode(data, callback) {
 					_this.setState({ displayAddNodePopup: 'block', newNodeData: data });
 				},
-				editNode: function editNode(data, callback) {
-					console.log(data);
-				},
+				editNode: function editNode(data, callback) {},
 				deleteNode: function deleteNode(data, callback) {
 					var node = data.nodes[0];
 					if (node) {
-						console.log('delete ' + node);
 						_this.nodefire.child(node).remove();
 					}
 				},
 				deleteEdge: function deleteEdge(data, callback) {
 					var edge = data.edges[0];
 					if (edge) {
-						console.log('delete ' + edge);
 						_this.edgefire.child(edge).remove();
 					}
 				},
@@ -42423,7 +42446,6 @@
 			var retreiveLabel = ['id', 'id', 'color', 'x', 'y'];
 			var containerLabel = ['id', 'label', 'color', 'x', 'y'];
 			nodes = (0, _utils.retrieveData)(snapshot.val(), retreiveLabel, containerLabel);
-
 			nodes = new _vis2.default.DataSet(nodes);
 			this.updateMap();
 		},
@@ -42437,12 +42459,28 @@
 		updateMap: function updateMap() {
 			var _this2 = this;
 
+			//adjust the map to previous center
+			var precenter = null;
+			var prescale = null;
+			if (nodes != [] && network != null) {
+				precenter = network.getViewPosition();
+				// console.log('the view position is');
+				// console.log(precenter)
+				prescale = network.getScale();
+			}
 			data = {
 				nodes: nodes,
 				edges: edges
 			};
 			network = new _vis2.default.Network(this.container, data, options);
-
+			if (precenter && prescale) {
+				network.moveTo({
+					position: precenter,
+					scale: prescale,
+					animation: false
+				});
+				this.props.changeMapView(precenter.x, precenter.y);
+			}
 			network.on("doubleClick", function (params) {
 				var edgeId = params['edges'][0];
 				if (edgeId) {
@@ -42454,24 +42492,34 @@
 				if (node) {
 					_firebase2.default.database().ref(_this2.state.courseID + "/_network/_concepts/" + node).update({
 						x: params['pointer']['canvas']['x'],
-						y: params['pointer']['canvas']['y'],
-						color: '#ccffcc'
+						y: params['pointer']['canvas']['y']
 					});
+				} else {
+					console.log('Drag the map');
+					var position = network.getViewPosition();
+					_this2.props.changeMapView(position.x, position.y);
 				}
 			});
 			network.on("dragStart", function (params) {
 				var node = params['nodes'][0];
-				// if(node){
-				// 	firebase.database().ref(this.state.courseID+"/_network/_concepts/"+node).update({
-				// 		color:'red'
-				// 	})
-				// }
 			});
 			this.setState({
 				data: data,
 				network: network
 			});
 			network.enableEditMode();
+		},
+		fitScreen: function fitScreen() {
+			var fitnodes;
+			this.nodefire.once('value').then(function (snapshot) {
+				fitnodes = snapshot.val();
+				fitnodes = Object.keys(fitnodes);
+				console.log(fitnodes);
+			});
+			network.fit({
+				nodes: fitnodes,
+				animation: false
+			});
 		},
 		handleEdgeLabelValueChange: function handleEdgeLabelValueChange(e) {
 			this.setState({
@@ -94641,7 +94689,7 @@
 
 
 	// module
-	exports.push([module.id, " body{\n  overflow-y: scroll;\n }\n .fullpage{\n  width: 100%;\n  min-height: 75%;\n }\n #network-container{\n  position: absolute;\n  margin-left: 10px;\n  height: 630px;\n }\n /*cursor*/\n #cursor-panel{\n  position: absolute;\n  background-color: white;\n  border: 1px solid lightgray;\n  width: 800px;\n  height: 630px;\n }\n .cursor{\n  position: absolute;\n  width: 60px;\n  height: 60px;\n  border-radius: 50%;\n  opacity: 0.1\n }\n #network{\n  position: absolute;\n  z-index: 10;\n  background-color: rgba(0,0,0,0); \n  padding-left: 10px;\n  border: 1px solid lightgray;\n  width: 800px;\n  height: 630px;\n }\n #network-popUp {\n    display:none;\n    width: 300;\n    z-index: 100;\n    position: absolute;\n    top:300px;\n    left:170px;\n  }\n/*index*/\n  #concept-input{\n    width: 150;\n  }\n  .account-input{\n    width: 320;\n  }\n  .center-container{\n    margin: 10;\n    text-align: center\n  }\n.title {\n  color: #d7ceb2;\n  font: 80px 'BazarMedium';\n  letter-spacing: 8px;\n}\n.slogan{\n  font-size: 16px;\n  padding: 20px;\n  text-align: center;\n}\n.account-input-container{\n  padding: 10px;\n  text-align: center;\n}\n.account-input-btn{\n  width: 200px;\n  margin: 5px;\n}\n.login-form {\n  max-width: 300px;\n}\n.login-form-forgot {\n  float: right;\n}\n.login-form-button {\n  width: 100%;\n}\n/*common usage*/\n.left{\n  float: left;\n}\n.right{\n  float: right;\n}\n.full-length{\n  width: 100%;\n}\n.half-circle-up{\n     height:100px;\n     width:200px;\n     border-radius: 90px 90px 0 0;\n     -moz-border-radius: 90px 90px 0 0;\n     -webkit-border-radius: 90px 90px 0 0;\n     background:white;\n     text-align: center;\n     vertical-align: middle;\n     line-height: 90px; \n     margin: auto;\n     margin-buttom: 0px;\n     font-size: 20;\n}\n.half-circle-down{\n     height:100px;\n     width:200px;\n     border-radius: 0 0 90px 90px;\n     -moz-border-radius: 0 0 90px 90px;\n     -webkit-border-radius: 0 0 90px 90px;\n     background:rgba(255, 137, 0, 0.86);\n     text-align: center;\n     vertical-align: middle;\n     line-height: 90px; \n     margin: auto;\n     font-size: 20;\n}\n/*comfirm card*/\n#toggle-icon{\n  width: 20px;\n  float: right;\n}\n.node{\n  background: #49a9ee;\n  width: 8px;\n  height: 8px;\n  border-radius: 50%;\n}\n.link{\n  width:100%;\n  height:3px;\n  background: #f03451;\n  margin: auto; \n}\n.comfirm-graph{\n  text-align: center;\n}\n.comfirm-graph-container{\n  margin: 10px 0;\n}\n.comfirm-graph-container.graph{\n  height: 8px;\n}\n.message-container{\n  background-color: #f7f7f7;\n  border-radius: 2%;\n  padding: 0 5px;\n  max-height: 150px;\n  overflow-y: scroll; \n}\n/*chat*/\n.chat-area{\n  position: absolute;\n  width: 250;\n}\n.chat-container{\n  margin: 5px;\n  padding: 5px;\n  height: 550px;\n  border: 1px solid #f7f7f7;\n  background-color: #fcfcfc;\n  border-radius: 2%;\n  overflow-y: scroll;\n}\n.chat-input{\n  margin: 0 5px;\n}\n.info-container{\n  width: 1000px;\n  height: 500px;\n}", ""]);
+	exports.push([module.id, " body{\n  overflow-y: scroll;\n }\n .fullpage{\n  width: 100%;\n  min-height: 75%;\n }\n #network-container{\n  position: absolute;\n  margin-left: 10px;\n  height: 630px;\n }\n  #map-background{\n    position: absolute;\n    width: 800px;\n    height: 630px;\n    z-index: 1;\n    opacity: 0.1;\n  }\n /*cursor*/\n #cursor-panel{\n  position: absolute;\n  z-index: 2;\n  background-color: rgba(0,0,0,0); \n  border: 1px solid lightgray;\n  width: 800px;\n  height: 630px;\n }\n .cursor{\n  position: absolute;\n  width: 60px;\n  height: 60px;\n  border-radius: 50%;\n  opacity: 0.1\n }\n #network{\n  position: absolute;\n  z-index: 3;\n  background-color: rgba(0,0,0,0); \n  padding-left: 10px;\n  border: 1px solid lightgray;\n  width: 800px;\n  height: 630px;\n }\n #network-popUp {\n    display:none;\n    width: 300;\n    z-index: 100;\n    position: absolute;\n    top:300px;\n    left:170px;\n  }\n/*index*/\n  #concept-input{\n    width: 150;\n  }\n  .account-input{\n    width: 320;\n  }\n  .center-container{\n    margin: 10;\n    text-align: center\n  }\n.title {\n  color: #d7ceb2;\n  font: 80px 'BazarMedium';\n  letter-spacing: 8px;\n}\n.slogan{\n  font-size: 16px;\n  padding: 20px;\n  text-align: center;\n}\n.account-input-container{\n  padding: 10px;\n  text-align: center;\n}\n.account-input-btn{\n  width: 200px;\n  margin: 5px;\n}\n.login-form {\n  max-width: 300px;\n}\n.login-form-forgot {\n  float: right;\n}\n.login-form-button {\n  width: 100%;\n}\n/*common usage*/\n.left{\n  float: left;\n}\n.right{\n  float: right;\n}\n.full-length{\n  width: 100%;\n}\n.half-circle-up{\n     height:100px;\n     width:200px;\n     border-radius: 90px 90px 0 0;\n     -moz-border-radius: 90px 90px 0 0;\n     -webkit-border-radius: 90px 90px 0 0;\n     background:white;\n     text-align: center;\n     vertical-align: middle;\n     line-height: 90px; \n     margin: auto;\n     margin-buttom: 0px;\n     font-size: 20;\n}\n.half-circle-down{\n     height:100px;\n     width:200px;\n     border-radius: 0 0 90px 90px;\n     -moz-border-radius: 0 0 90px 90px;\n     -webkit-border-radius: 0 0 90px 90px;\n     background:rgba(255, 137, 0, 0.86);\n     text-align: center;\n     vertical-align: middle;\n     line-height: 90px; \n     margin: auto;\n     font-size: 20;\n}\n/*comfirm card*/\n#toggle-icon{\n  width: 20px;\n  float: right;\n}\n.node{\n  background: #49a9ee;\n  width: 8px;\n  height: 8px;\n  border-radius: 50%;\n}\n.link{\n  width:100%;\n  height:3px;\n  background: #f03451;\n  margin: auto; \n}\n.comfirm-graph{\n  text-align: center;\n}\n.comfirm-graph-container{\n  margin: 10px 0;\n}\n.comfirm-graph-container.graph{\n  height: 8px;\n}\n.message-container{\n  background-color: #f7f7f7;\n  border-radius: 2%;\n  padding: 0 5px;\n  max-height: 150px;\n  overflow-y: scroll; \n}\n/*chat*/\n.chat-area{\n  position: absolute;\n  width: 250;\n}\n.chat-container{\n  margin: 5px;\n  padding: 5px;\n  height: 550px;\n  border: 1px solid #f7f7f7;\n  background-color: #fcfcfc;\n  border-radius: 2%;\n  overflow-y: scroll;\n}\n.chat-input{\n  margin: 0 5px;\n}\n.info-container{\n  width: 1000px;\n  height: 500px;\n}", ""]);
 
 	// exports
 
@@ -94941,7 +94989,8 @@
 			return {
 				courseID: this.props.courseID,
 				user: this.props.user,
-				cursors: []
+				cursors: [],
+				origin: []
 			};
 		},
 		componentDidMount: function componentDidMount() {
@@ -94950,10 +94999,21 @@
 		},
 		updateCursor: function updateCursor(snapshot) {
 			var result = snapshot.val();
+			var origin = this.state.origin;
 			if (result) {
+				this.setState({ origin: { x: result[this.state.user].mapX, y: result[this.state.user].mapY } });
 				delete result[this.state.user];
-				this.setState({ cursors: (0, _utils.toArray)(result) });
+				var cursors = [];
+				Object.keys(result).map(function (key, index) {
+					var x = result[key].cursorX + result[key].mapX - origin.x;
+					var y = result[key].cursorY + result[key].mapY - origin.y;
+					cursors.push({ cursorX: x, cursorY: y });
+				});
+				this.setState({ cursors: cursors });
 			}
+		},
+		setMapView: function setMapView(x, y) {
+			this.fire.child(this.state.user).update({ mapX: x, mapY: y });
 		},
 		handleMouseMove: function handleMouseMove(x, y) {
 			var offsetX = x - 30;
@@ -96884,23 +96944,28 @@
 	  displayName: 'NormalLoginForm',
 
 	  componentDidMount: function componentDidMount() {
+	    var _this = this;
 	    _firebase2.default.auth().onAuthStateChanged(function (user) {
 	      if (user) {
 	        //user has logged in!
 	        (0, _utils.setCookie)('userEmail', user['email'], 1);
 	        (0, _utils.setCookie)('uid', user['uid'], 1);
-	        window.location.assign('/conceptExtraction');
+
+	        _firebase2.default.database().ref(_this.state.courseID + '/_members').push({ uid: user['uid'] });
+	        window.location.assign(_this.state.courseID);
 	      }
 	    });
 	  },
 	  handleSubmit: function handleSubmit(e) {
-	    var _this = this;
+	    var _this2 = this;
 
 	    e.preventDefault();
 	    this.props.form.validateFields(function (err, values) {
 	      if (!err) {
 	        console.log('Received values of form: ', values);
-	        _this.login(values['email'], values['password']);
+	        _this2.login(values['email'], values['password']);
+	        //courseID
+	        _this2.setState({ courseID: values['courseID'] });
 	      }
 	    });
 	  },
@@ -96928,7 +96993,9 @@
 	      }]
 	    })(_react2.default.createElement(_input2.default, { addonBefore: _react2.default.createElement(_icon2.default, { type: 'mail' }), placeholder: 'E-mail' }))), _react2.default.createElement(FormItem, null, getFieldDecorator('password', {
 	      rules: [{ required: true, message: 'Please input your Password!' }]
-	    })(_react2.default.createElement(_input2.default, { addonBefore: _react2.default.createElement(_icon2.default, { type: 'lock' }), type: 'password', placeholder: 'Password', onPressEnter: this.handleSubmit }))), _react2.default.createElement(FormItem, null, _react2.default.createElement(_button2.default, { type: 'primary', htmlType: 'submit', className: 'login-form-button' }, 'Log in'), 'Or ', _react2.default.createElement('a', null, 'register now!'), _react2.default.createElement('a', { className: 'login-form-forgot' }, 'Forgot password')));
+	    })(_react2.default.createElement(_input2.default, { addonBefore: _react2.default.createElement(_icon2.default, { type: 'lock' }), type: 'password', placeholder: 'Password' }))), _react2.default.createElement(FormItem, null, getFieldDecorator('courseID', {
+	      rules: [{ required: true, message: 'Please input your course ID!' }]
+	    })(_react2.default.createElement(_input2.default, { addonBefore: _react2.default.createElement(_icon2.default, { type: 'rocket' }), placeholder: 'Course ID', onPressEnter: this.handleSubmit }))), _react2.default.createElement(FormItem, null, _react2.default.createElement(_button2.default, { type: 'primary', htmlType: 'submit', className: 'login-form-button' }, 'Log in'), 'Or ', _react2.default.createElement('a', null, 'register now!'), _react2.default.createElement('a', { className: 'login-form-forgot' }, 'Forgot password')));
 	  }
 	}));
 
@@ -104682,30 +104749,29 @@
 		getInitialState: function getInitialState() {
 			return {
 				courseID: this.props.params.courseID,
-				courseURL: this.props.route.courseURL
+				courseURL: this.props.route.courseURL,
+				haveGoDiscussion: false
 			};
 		},
-		componentDidMount: function componentDidMount() {
-
-			Events.scrollEvent.register('begin', function (to, element) {
-				console.log("begin", arguments);
-			});
-
-			Events.scrollEvent.register('end', function (to, element) {
-				console.log("end", arguments);
-			});
-
-			scrollSpy.update();
-		},
-		componentWillUnmount: function componentWillUnmount() {
-			Events.scrollEvent.remove('begin');
-			Events.scrollEvent.remove('end');
-		},
+		componentDidUpdate: function componentDidUpdate() {},
+		componentWillUnmount: function componentWillUnmount() {},
 		scrollToTop: function scrollToTop() {
 			scroll.scrollToTop();
 		},
+		goDiscussion: function goDiscussion() {
+			this.conceptMapping.fitScreen();
+		},
 		render: function render() {
-			return _react2.default.createElement('div', null, _react2.default.createElement(Element, { name: 'video', className: 'element' }, _react2.default.createElement('div', { style: { padding: '10 50', backgroundColor: '#e9e9e9', height: '80%' } }, _react2.default.createElement(_ConceptExtraction2.default, { courseURL: this.state.courseURL, courseID: this.state.courseID }))), _react2.default.createElement(Link, { activeClass: 'active', to: 'tutorial', spy: true, smooth: true, offset: 50, duration: 500 }, _react2.default.createElement(_row2.default, { style: { backgroundColor: '#e9e9e9' } }, _react2.default.createElement(_col2.default, { className: 'half-circle-up center' }, 'Go discussion'))), _react2.default.createElement(Element, { name: 'discussion', className: 'element' }, _react2.default.createElement(Link, { activeClass: 'active', onClick: this.scrollToTop, spy: true, smooth: true, offset: 50, duration: 500 }, _react2.default.createElement(_row2.default, { style: { backgroundColor: '#f7f7f7', height: '15%' } }, _react2.default.createElement(_col2.default, { className: 'half-circle-down center', style: { backgroundColor: '#79f7bc' } }, 'Review video'))), _react2.default.createElement('div', { style: { padding: '0 50', backgroundColor: '#f7f7f7', height: '90%' } }, _react2.default.createElement(_ConceptMapping2.default, { courseURL: this.state.courseURL, courseID: this.state.courseID }))), _react2.default.createElement(Element, { name: 'tutorial', className: 'element' }, _react2.default.createElement('div', { style: { padding: '10 50', backgroundColor: 'white', height: '80%' } }, _react2.default.createElement(_ConceptMapInformation2.default, null)), _react2.default.createElement(Link, { activeClass: 'active', to: 'discussion', spy: true, smooth: true, offset: 0, duration: 500 }, _react2.default.createElement(_row2.default, { style: { backgroundColor: 'white' } }, _react2.default.createElement(_col2.default, { className: 'half-circle-up center', style: { backgroundColor: '#FFE066' } }, 'Start!')))));
+			var _this = this;
+
+			var _ = this.state;
+			return _react2.default.createElement('div', null, _react2.default.createElement(Element, { name: 'video', className: 'element' }, _react2.default.createElement('div', { style: { padding: '10 50', backgroundColor: '#e9e9e9', height: '80%' } }, _react2.default.createElement(_ConceptExtraction2.default, { ref: function ref(e) {
+					_this.conceptExtraction = e;
+				}, courseURL: this.state.courseURL, courseID: this.state.courseID }))), _react2.default.createElement(Link, { activeClass: 'active', to: 'tutorial', smooth: true, offset: 50, duration: 500, onClick: function onClick() {
+					return _this.goDiscussion();
+				} }, _react2.default.createElement(_row2.default, { style: { backgroundColor: '#e9e9e9' } }, _react2.default.createElement(_col2.default, { className: 'half-circle-up center' }, 'Go discussion'))), _react2.default.createElement(Element, { name: 'discussion', className: 'element' }, _react2.default.createElement(Link, { activeClass: 'active', onClick: this.scrollToTop, spy: true, smooth: true, offset: 0, duration: 500 }, _react2.default.createElement(_row2.default, { style: { backgroundColor: '#f7f7f7', height: '15%' } }, _react2.default.createElement(_col2.default, { className: 'half-circle-down center', style: { backgroundColor: '#79f7bc' } }, 'Review video'))), _react2.default.createElement('div', { style: { padding: '0 50', backgroundColor: '#f7f7f7', height: '90%' } }, _react2.default.createElement(_ConceptMapping2.default, { ref: function ref(e) {
+					_this.conceptMapping = e;
+				}, courseURL: this.state.courseURL, courseID: this.state.courseID }))), _react2.default.createElement(Element, { name: 'tutorial', className: 'element' }, _react2.default.createElement('div', { style: { padding: '10 50', backgroundColor: 'white', height: '80%' } }, _react2.default.createElement(_ConceptMapInformation2.default, null)), _react2.default.createElement(Link, { activeClass: 'active', to: 'discussion', spy: true, smooth: true, offset: 0, duration: 500 }, _react2.default.createElement(_row2.default, { style: { backgroundColor: 'white' } }, _react2.default.createElement(_col2.default, { className: 'half-circle-up center', style: { backgroundColor: '#FFE066' } }, 'Start!')))));
 		}
 	});
 	exports.default = Main;
@@ -105596,6 +105662,34 @@
 
 	// exports
 
+
+/***/ },
+/* 597 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _react = __webpack_require__(123);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) {
+		return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	var MapGrid = _react2.default.createClass({
+		displayName: 'MapGrid',
+
+		render: function render() {
+			return _react2.default.createElement('div', null, _react2.default.createElement('img', { id: 'map-background', src: './img/Grid.gif' }));
+		}
+	});
+
+	exports.default = MapGrid;
 
 /***/ }
 /******/ ]);

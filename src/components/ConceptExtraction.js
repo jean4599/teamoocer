@@ -17,9 +17,6 @@ const ConceptExtraction = React.createClass ({
 		this.refs.player.jumpToTime(time);
 	},
 	conceptAggregation: function(){
-		// this.inputConcept.handleConceptAggreagate(
-		// 	()=>{window.location.assign('/conceptMapping')}
-		// 	);
 		this.inputConcept.handleConceptAggreagate();
 	},
 	render: function(){
@@ -30,7 +27,7 @@ const ConceptExtraction = React.createClass ({
 				<Col span={16}><VideoPlayer courseURL={_.courseURL} controls={true} width={854} height={480} ref='player'/></Col>
 				<Col span={8}>
 					<InputConcept ref={c=>{this.inputConcept=c}} courseID={_.courseID} getPlayedTime={this.getPlayedTime} jumpToTime={this.jumpToTime}/>
-					<Button type='primary' style={{marginTop: 10}} onClick={()=>this.conceptAggregation()}> Save </Button>
+					<Button type='primary' style={{marginTop: 10}} onClick={()=>this.conceptAggregation()}> Share these concepts </Button>
 				</Col>
 			</Row>
 			)

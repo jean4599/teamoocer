@@ -1,4 +1,7 @@
 import React from 'react'
+
+const GradColor = ['#C0FCD0', '#B1F0A1', '#A2E572', '#92DA43'];
+
 export function toArray(obj) {
   if (!obj) return []
 
@@ -54,6 +57,9 @@ export function getCookie(cname) {
       }
       return "";
     }
+export function getGradColor(scale){
+  return GradColor[scale];
+}
 function clone(obj) {
     if (null == obj || "object" != typeof obj) return obj;
     var copy = obj.constructor();

@@ -7,12 +7,15 @@ const FormItem = Form.Item;
 
 const NormalLoginForm = Form.create()(React.createClass({
   componentDidMount: function(){
+    var _this = this;
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
         //user has logged in!
         setCookie('userEmail', user['email'], 1)
         setCookie('uid', user['uid'], 1)
-        window.location.assign('/conceptExtraction')
+
+        firebase.database().ref(_this.state.courseID+'/_members').push({uid: user['uid']})
+        window.location.assign(_this.state.courseID)
       }
     });
   },
@@ -22,6 +25,8 @@ const NormalLoginForm = Form.create()(React.createClass({
       if (!err) {
         console.log('Received values of form: ', values);
         this.login(values['email'], values['password']);
+        //courseID
+        this.setState({courseID: values['courseID']})
       }
     });
   },
@@ -58,7 +63,14 @@ const NormalLoginForm = Form.create()(React.createClass({
           {getFieldDecorator('password', {
             rules: [{ required: true, message: 'Please input your Password!' }],
           })(
-            <Input addonBefore={<Icon type="lock" />} type="password" placeholder="Password" onPressEnter={this.handleSubmit}/>
+            <Input addonBefore={<Icon type="lock" />} type="password" placeholder="Password"/>
+          )}
+        </FormItem>
+        <FormItem>
+          {getFieldDecorator('courseID', {
+            rules: [{ required: true, message: 'Please input your course ID!' }],
+          })(
+            <Input addonBefore={<Icon type="rocket" />} placeholder="Course ID" onPressEnter={this.handleSubmit}/>
           )}
         </FormItem>
         <FormItem>

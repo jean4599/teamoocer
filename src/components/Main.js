@@ -16,47 +16,48 @@ const Main = React.createClass({
 		return {
 			courseID: this.props.params.courseID,
 			courseURL: this.props.route.courseURL,
+			haveGoDiscussion: false,
 		}
 	},
-	componentDidMount: function() {
-
-	    Events.scrollEvent.register('begin', function(to, element) {
-	      console.log("begin", arguments);
-	    });
-
-	    Events.scrollEvent.register('end', function(to, element) {
-	      console.log("end", arguments);
-	    });
-
-	    scrollSpy.update();
-
+	componentDidUpdate: function() {
 	  },
 	componentWillUnmount: function() {
-		Events.scrollEvent.remove('begin');
-		Events.scrollEvent.remove('end');
 	},
 	scrollToTop: function() {
-    scroll.scrollToTop();
-  },
+    	scroll.scrollToTop();
+  	},
+  	goDiscussion: function(){
+  		this.conceptMapping.fitScreen();
+  	},
 	render: function(){
+		var _ = this.state;
 		return (
 				<div>
 					<Element name="video" className="element">
-			          	<div style={{padding: '10 50', backgroundColor: '#e9e9e9', height: '80%' }}><ConceptExtraction courseURL={this.state.courseURL} courseID={this.state.courseID}/></div>
+			          	<div style={{padding: '10 50', backgroundColor: '#e9e9e9', height: '80%' }}>
+			          		<ConceptExtraction ref={e=>{this.conceptExtraction=e}} courseURL={this.state.courseURL} courseID={this.state.courseID}/>
+			          	</div>
 			        </Element>
 
-					<Link activeClass="active" to="tutorial" spy={true} smooth={true} offset={50} duration={500} >
-			          <Row style={{backgroundColor: '#e9e9e9'}} ><Col className='half-circle-up center'>Go discussion</Col></Row>
+					<Link activeClass="active" to='tutorial' smooth={true} offset={50} duration={500} onClick={()=>this.goDiscussion()}>
+			          <Row style={{backgroundColor: '#e9e9e9'}}>
+			         	 <Col className='half-circle-up center'>Go discussion</Col>
+			          </Row>
 			        </Link>
 
-			        <Element name="discussion" className="element">
-						<Link activeClass="active" onClick={this.scrollToTop} spy={true} smooth={true} offset={50} duration={500} >
-				          <Row style={{backgroundColor: '#f7f7f7', height: '15%'}} ><Col className='half-circle-down center' style={{backgroundColor: '#79f7bc'}}>Review video</Col></Row>
+			        <Element name="discussion" className="element" >
+						<Link activeClass="active" onClick={this.scrollToTop} spy={true} smooth={true} offset={0} duration={500} >
+				          <Row style={{backgroundColor: '#f7f7f7', height: '15%'}}>
+				          	<Col className='half-circle-down center' style={{backgroundColor: '#79f7bc'}}>Review video</Col>
+				          </Row>
 				        </Link>
-			        	<div style={{padding: '0 50', backgroundColor: '#f7f7f7', height: '90%' }}><ConceptMapping courseURL={this.state.courseURL} courseID={this.state.courseID}/></div>
+
+			        	<div style={{padding: '0 50', backgroundColor: '#f7f7f7', height: '90%' }}>
+			        		<ConceptMapping ref={e=>{this.conceptMapping=e}} courseURL={this.state.courseURL} courseID={this.state.courseID}/>
+			        	</div>
 			        </Element>
 			        
-			        <Element name='tutorial' className='element'>
+			        <Element name='tutorial' className='element' >
 			        	<div style={{padding: '10 50', backgroundColor: 'white', height: '80%' }}><ConceptMapInformation /></div>
 				        <Link activeClass="active" to="discussion" spy={true} smooth={true} offset={0} duration={500} >
 					          <Row style={{backgroundColor: 'white'}} ><Col className='half-circle-up center' style={{backgroundColor: '#FFE066'}}>Start!</Col></Row>

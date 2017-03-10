@@ -13,11 +13,14 @@ import {Row, Col, Button, Input, Dropdown, Menu, Icon, Card} from 'antd'
 		    nodes:{
 		    	chosen:false,
 		    	shape: 'box',
-		    	color: '#ccffcc'
+		    	color: '#C0FCD0'
 		    },
 		    interaction:{
 		    	hover:true,
 		    	selectConnectedEdges: false,
+		    },
+		    layout:{
+		    	randomSeed:100,
 		    },
 		    locale: 'en',
 		    locales:{
@@ -41,7 +44,7 @@ import {Row, Col, Button, Input, Dropdown, Menu, Icon, Card} from 'antd'
   var nodes=[];
   var edges=[];
   var data={};
-  var network={};
+  var network=null;
 
 const ConceptMapping = React.createClass({
 	getInitialState: function(){
@@ -50,10 +53,6 @@ const ConceptMapping = React.createClass({
       		courseURL: this.props.courseURL,
       		data:{},
       		mode: 'nomal',
-      		EdgeInputDisabled1:true,
-      		EdgeInputDisabled2:true,
-      		EdgeSubmitDisabled:true,
-      		edgeIcons: ["ellipsis","minus","arrow-right"],
       		edgeLabelValue:'',
       		requests:[],
 		}
@@ -71,19 +70,16 @@ const ConceptMapping = React.createClass({
 		            _this.setState({displayAddNodePopup:'block', newNodeData: data})
 		          },
 		          editNode: function (data, callback) {
-		          	console.log(data)
 		          },
 		          deleteNode: function(data, callback){
 		            var node = data.nodes[0]
 		            if(node){
-		            	console.log('delete ' + node);
 		           		_this.nodefire.child(node).remove()    	
 		            }
 		          },
 		          deleteEdge: function(data, callback){
 		            var edge = data.edges[0]
 		            if(edge){
-		            	console.log('delete ' + edge);
 		           		_this.edgefire.child(edge).remove()    	
 	            	}
 		          },
@@ -106,7 +102,6 @@ const ConceptMapping = React.createClass({
 		var retreiveLabel = ['id', 'id','color', 'x', 'y']
 		var containerLabel = ['id', 'label','color', 'x', 'y']
 		nodes = retrieveData(snapshot.val(), retreiveLabel, containerLabel);
-		
 		nodes = new vis.DataSet(nodes);
 		this.updateMap();
 	},
@@ -118,12 +113,28 @@ const ConceptMapping = React.createClass({
 		this.updateMap();
 	},
 	updateMap: function(){
+		//adjust the map to previous center
+		var precenter = null;
+		var prescale = null;
+		if(nodes!=[] && network!=null){
+			precenter = network.getViewPosition();
+			// console.log('the view position is');
+			// console.log(precenter)
+			prescale = network.getScale();
+		}
 		data={
 			nodes: nodes,
 			edges: edges
 		}
 		network = new vis.Network(this.container, data, options);
-		
+		if(precenter && prescale){
+			network.moveTo({
+			  position: precenter,
+			  scale: prescale,
+			  animation: false,
+			})
+			this.props.changeMapView(precenter.x, precenter.y);
+		}
 	    network.on("doubleClick", (params)=>{
 			var edgeId = params['edges'][0];
 			if(edgeId){
@@ -136,23 +147,34 @@ const ConceptMapping = React.createClass({
 	    		firebase.database().ref(this.state.courseID+"/_network/_concepts/"+node).update({
 	    			x: params['pointer']['canvas']['x'],
 	    			y: params['pointer']['canvas']['y'],
-	    			color: '#ccffcc'
 	    		})
+	    	}
+	    	else{
+	    		console.log('Drag the map')
+	    		var position = network.getViewPosition();
+	    		this.props.changeMapView(position.x, position.y);
 	    	}
 	    });
 	    network.on("dragStart", (params)=>{
 	    	var node = params['nodes'][0]
-	    	// if(node){
-	    	// 	firebase.database().ref(this.state.courseID+"/_network/_concepts/"+node).update({
-	    	// 		color:'red'
-	    	// 	})
-	    	// }
 	    });
 		this.setState({
 			data: data,
 			network: network
 		})
 		network.enableEditMode()
+	},
+	fitScreen: function(){
+		var fitnodes;
+		this.nodefire.once('value').then(function(snapshot){
+			fitnodes = snapshot.val();
+			fitnodes = Object.keys(fitnodes)
+			console.log(fitnodes)
+		})
+		network.fit({
+			nodes: fitnodes,
+			animation: false,
+		})
 	},
 	handleEdgeLabelValueChange: function(e){
 		this.setState({

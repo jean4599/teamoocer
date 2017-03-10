@@ -4,6 +4,7 @@ import NoticeBoard from './NoticeBoard'
 import CursorPanel from './CursorPanel'
 import ChatRoom from './ChatRoom'
 import ConceptMapInformation from './ConceptMapInformation'
+import MapGrid from './MapGrid'
 import {Row, Col, Button, Modal} from 'antd'
 import {getCookie} from '../utils'
 import ReactCursorPosition from 'react-cursor-position'
@@ -36,6 +37,12 @@ const ConceptMapping = React.createClass({
 		    onOk() {},
 		 });
 	},
+	fitScreen: function(){
+		this.network.fitScreen();
+	},
+	setMapView: function(x,y){
+		this.cursorPanel.setMapView(x,y)
+	},
 	render: function(){
 		var _ = this.state;
 		return(
@@ -52,7 +59,7 @@ const ConceptMapping = React.createClass({
 							// onMouseMove={(e)=>{this.handleMouseMove(e)}}
 							onCursorPositionChanged={(e)=>{this.handleMouseMove(e)}}
 							>
-
+							<MapGrid />
 							<CursorPanel 
 								ref={panel=>{this.cursorPanel = panel}}
 								courseID={_.courseID}
@@ -61,7 +68,8 @@ const ConceptMapping = React.createClass({
 								ref={network=>{this.network=network}}
 								courseURL={_.courseURL} 
 								courseID={_.courseID}
-								sendLinkPhraseNotice={this.sendLinkPhraseNotice} />
+								sendLinkPhraseNotice={this.sendLinkPhraseNotice}
+								changeMapView={this.setMapView} />
 						</ReactCursorPosition>
 					</Col>
 					<Col span={4}>

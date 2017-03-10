@@ -15,6 +15,7 @@ const CursorPanel = React.createClass({
 			courseID: this.props.courseID,
 			user: this.props.user,
 			cursors: [],
+			origin: [],
 		}
 	},
 	componentDidMount: function(){
@@ -23,10 +24,21 @@ const CursorPanel = React.createClass({
 	},
 	updateCursor:function(snapshot){
 		var result = snapshot.val();
+		var origin = this.state.origin
 		if(result){
+			this.setState({origin:{x: result[this.state.user].mapX, y: result[this.state.user].mapY}})
 			delete result[this.state.user]
-			this.setState({cursors: toArray(result)})
+			var cursors=[];
+			Object.keys(result).map(function (key, index){
+				var x = result[key].cursorX + result[key].mapX-origin.x;
+				var y = result[key].cursorY + result[key].mapY-origin.y;
+				cursors.push({cursorX: x, cursorY: y})
+			})
+			this.setState({cursors: cursors})
 		}
+	},
+	setMapView: function(x,y){
+		this.fire.child(this.state.user).update({mapX: x, mapY: y});
 	},
 	handleMouseMove:function(x, y){         
 		var offsetX = x-30;
