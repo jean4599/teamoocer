@@ -35,8 +35,7 @@ const T = React.createClass({
 		)
 	}
 })
-var courseURL = "https://www.youtube.com/watch?v=pR1xsocj_Pw&index=4&list=PLXVfgk9fNX2I7tB6oIINGBmW50rrmFTqf";
-var courseID = "p4XTMvagQ2Q"
+var courseURL = "https://www.youtube.com/watch?v=cFdCzN7RYbw";
 
 ReactDOM.render(
 	<Router history={browserHistory}>
