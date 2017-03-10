@@ -1,4 +1,5 @@
 import React from 'react'
+import firebase from 'firebase'
 import Network from './Network'
 import NoticeBoard from './NoticeBoard'
 import CursorPanel from './CursorPanel'
@@ -16,6 +17,9 @@ const ConceptMapping = React.createClass({
       			courseURL: this.props.courseURL,
       			user: getCookie('uid')			
 		}
+	},
+	componentDidMount: function(){
+		var ref = firebase.database().ref(this.state.courseID + '/_members').push(this.state.user)
 	},
 	sendLinkPhraseNotice: function(edgeID){
 		this.noticeBoard.addComfirmLinkPhrase(edgeID, this.state.user);

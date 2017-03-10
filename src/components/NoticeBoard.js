@@ -13,7 +13,7 @@ const NoticeBoard = React.createClass({
 		}
 	},
 	componentDidMount: function(){
-		this.memberFire = firebase.database().ref(this.state.courseID+'/_network/_members');
+		this.memberFire = firebase.database().ref(this.state.courseID+'/_members');
 		this.memberFire.on('value', this.updateMembers);
 		this.linkphraseFire = firebase.database().ref(this.state.courseID+'/_notice/_link');
 		this.linkphraseFire.on('value', this.updateComfirmLinkPhrase);

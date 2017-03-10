@@ -19,10 +19,6 @@ const Main = React.createClass({
 			haveGoDiscussion: false,
 		}
 	},
-	componentDidUpdate: function() {
-	  },
-	componentWillUnmount: function() {
-	},
 	scrollToTop: function() {
     	scroll.scrollToTop();
   	},

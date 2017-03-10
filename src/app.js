@@ -42,9 +42,6 @@ ReactDOM.render(
     <Route path="/" component={T}>
         <IndexRoute component={IndexView}/>
         <Route courseURL={courseURL} path='/:courseID' component={Main} />
-        // <Route courseURL={courseURL} courseID={courseID} path='conceptExtraction' component={conceptExtraction} />
-        // <Route courseURL={courseURL} courseID={courseID} path='conceptAggregation' component={conceptAggregation} />
-        // <Route courseURL={courseURL} courseID={courseID} path='conceptMapping' component={conceptMapping} />
         <Route path="*" component={NotFoundView}/>
     </Route>
   </Router>,
