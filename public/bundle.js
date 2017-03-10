@@ -63,7 +63,7 @@
 /******/ 	}
 
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "aecbc4838aff4bec37b2"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "39decf893bd42d9da453"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
 
@@ -94744,9 +94744,14 @@
 			this.memberFire.on('value', this.updateMembers);
 			this.linkphraseFire = _firebase2.default.database().ref(this.state.courseID + '/_notice/_link');
 			this.linkphraseFire.on('value', this.updateComfirmLinkPhrase);
+			this.noticeHistory = _firebase2.default.database().ref(this.state.courseID + '/_notice/_history');
 		},
 		removeLinkPhraseComfirm: function removeLinkPhraseComfirm(linkID) {
 			console.log('remove: ' + linkID);
+			var fir = this.noticeHistory;
+			this.linkphraseFire.child(linkID).once('value').then(function (snapshot) {
+				fir.push(snapshot.val());
+			});
 			this.linkphraseFire.child(linkID).remove();
 		},
 		updateMembers: function updateMembers(snapshot) {

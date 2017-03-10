@@ -17,9 +17,14 @@ const NoticeBoard = React.createClass({
 		this.memberFire.on('value', this.updateMembers);
 		this.linkphraseFire = firebase.database().ref(this.state.courseID+'/_notice/_link');
 		this.linkphraseFire.on('value', this.updateComfirmLinkPhrase);
+		this.noticeHistory = firebase.database().ref(this.state.courseID+'/_notice/_history');
 	},
 	removeLinkPhraseComfirm: function(linkID){
 		console.log('remove: '+linkID)
+		var fir = this.noticeHistory;
+		this.linkphraseFire.child(linkID).once('value').then(function(snapshot){
+			fir.push(snapshot.val())			
+		})
 		this.linkphraseFire.child(linkID).remove();
 	},
 	updateMembers: function(snapshot){
