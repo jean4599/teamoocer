@@ -69,8 +69,6 @@ const ConceptMapping = React.createClass({
 		          addNode: function(data, callback){
 		            _this.setState({displayAddNodePopup:'block', newNodeData: data})
 		          },
-		          editNode: function (data, callback) {
-		          },
 		          deleteNode: function(data, callback){
 		            var node = data.nodes[0]
 		            if(node){
@@ -208,6 +206,11 @@ const ConceptMapping = React.createClass({
 		})
 		this.clearPopUp('editEdge')
 		this.props.sendLinkPhraseNotice(this.state.selectedEdge)
+	},
+	deleteNode: function(node){
+        if(node){
+       		_this.nodefire.child(node).remove()    	
+        }
 	},
 	clearPopUp:function(type){
 		if(type == 'addNode') this.setState({newConcept:'', displayAddNodePopup:'none'})

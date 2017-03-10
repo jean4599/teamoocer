@@ -19,14 +19,15 @@ const ConceptMapping = React.createClass({
 		}
 	},
 	componentDidMount: function(){
-		var ref = firebase.database().ref(this.state.courseID + '/_members').push(this.state.user)
+		this.addMember();
+	},
+	addMember: function(){
+		var ref = firebase.database().ref(this.state.courseID + '/_members/'+this.state.user).update({uid: this.state.user})
 	},
 	sendLinkPhraseNotice: function(edgeID){
 		this.noticeBoard.addComfirmLinkPhrase(edgeID, this.state.user);
 	},
 	handleMouseMove: function(e){
-		// e.persist()
-		// this.cursorPanel.handleMouseMove(e.clientX, e.clientY)
 		this.cursorPanel.handleMouseMove(e.x, e.y)
 	},
 	changeEdgeToSolidLine: function(edgeID){

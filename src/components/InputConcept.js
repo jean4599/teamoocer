@@ -78,7 +78,6 @@ const InputConcept = React.createClass({
 				</div>
 				<Row>
 					<Col span={20}><Input placeholder="New concept" onPressEnter={()=>this.handleConceptAdd()} value={this.state.conceptInputValue} onChange={this.handleConceptInputVlueChange}/></Col>
-					<Col span={4}><Button type="primary" onClick={()=>this.handleConceptAdd()}>Add</Button></Col>
 				</Row>
 			</div>
 			)

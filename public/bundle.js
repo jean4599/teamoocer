@@ -63,7 +63,7 @@
 /******/ 	}
 
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "39decf893bd42d9da453"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "7572f860639d838326f2"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
 
@@ -32979,31 +32979,25 @@
 		value: true
 	});
 
-	var _style6 = __webpack_require__(370);
+	var _style5 = __webpack_require__(370);
 
 	var _row = __webpack_require__(373);
 
 	var _row2 = _interopRequireDefault(_row);
 
-	var _style7 = __webpack_require__(377);
-
-	var _button = __webpack_require__(380);
-
-	var _button2 = _interopRequireDefault(_button);
-
-	var _style8 = __webpack_require__(383);
+	var _style6 = __webpack_require__(383);
 
 	var _col = __webpack_require__(384);
 
 	var _col2 = _interopRequireDefault(_col);
 
-	var _style9 = __webpack_require__(401);
+	var _style7 = __webpack_require__(401);
 
 	var _input = __webpack_require__(404);
 
 	var _input2 = _interopRequireDefault(_input);
 
-	var _style10 = __webpack_require__(409);
+	var _style8 = __webpack_require__(409);
 
 	var _timeline = __webpack_require__(412);
 
@@ -33120,9 +33114,7 @@
 					} }, ' ', concept.word, ' ', _react2.default.createElement(_Duration2.default, { seconds: concept.time }));
 			})), _react2.default.createElement(_row2.default, null, _react2.default.createElement(_col2.default, { span: 20 }, _react2.default.createElement(_input2.default, { placeholder: 'New concept', onPressEnter: function onPressEnter() {
 					return _this2.handleConceptAdd();
-				}, value: this.state.conceptInputValue, onChange: this.handleConceptInputVlueChange })), _react2.default.createElement(_col2.default, { span: 4 }, _react2.default.createElement(_button2.default, { type: 'primary', onClick: function onClick() {
-					return _this2.handleConceptAdd();
-				} }, 'Add'))));
+				}, value: this.state.conceptInputValue, onChange: this.handleConceptInputVlueChange }))));
 		}
 	});
 	exports.default = InputConcept;
@@ -42233,14 +42225,15 @@
 			};
 		},
 		componentDidMount: function componentDidMount() {
-			var ref = _firebase2.default.database().ref(this.state.courseID + '/_members').push(this.state.user);
+			this.addMember();
+		},
+		addMember: function addMember() {
+			var ref = _firebase2.default.database().ref(this.state.courseID + '/_members/' + this.state.user).update({ uid: this.state.user });
 		},
 		sendLinkPhraseNotice: function sendLinkPhraseNotice(edgeID) {
 			this.noticeBoard.addComfirmLinkPhrase(edgeID, this.state.user);
 		},
 		handleMouseMove: function handleMouseMove(e) {
-			// e.persist()
-			// this.cursorPanel.handleMouseMove(e.clientX, e.clientY)
 			this.cursorPanel.handleMouseMove(e.x, e.y);
 		},
 		changeEdgeToSolidLine: function changeEdgeToSolidLine(edgeID) {
@@ -42421,7 +42414,6 @@
 				addNode: function addNode(data, callback) {
 					_this.setState({ displayAddNodePopup: 'block', newNodeData: data });
 				},
-				editNode: function editNode(data, callback) {},
 				deleteNode: function deleteNode(data, callback) {
 					var node = data.nodes[0];
 					if (node) {
@@ -42559,6 +42551,11 @@
 			});
 			this.clearPopUp('editEdge');
 			this.props.sendLinkPhraseNotice(this.state.selectedEdge);
+		},
+		deleteNode: function deleteNode(node) {
+			if (node) {
+				_this.nodefire.child(node).remove();
+			}
 		},
 		clearPopUp: function clearPopUp(type) {
 			if (type == 'addNode') this.setState({ newConcept: '', displayAddNodePopup: 'none' });else if (type == 'editEdge') this.setState({ edgeLabelValue: '', displayEditEdgePopup: 'none' });
