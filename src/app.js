@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom'
 import * as firebase from 'firebase'
 import {IndexRoute, Router, Route, browserHistory} from 'react-router'
 import conceptExtraction from './components/ConceptExtraction'
-import conceptAggregation from './components/ConceptAggregation'
 import conceptMapping from './components/ConceptMapping'
 import IndexView from './components/IndexView'
+import GoogleDoc from './components/GoogleDoc'
 import Main from './components/Main'
 import NotFoundView from './components/NotFoundView'
 import { Layout } from 'antd';
@@ -41,6 +41,7 @@ ReactDOM.render(
 	<Router history={browserHistory}>
     <Route path="/" component={T}>
         <IndexRoute component={IndexView}/>
+        <Route path='googledoc' component={GoogleDoc} />
         <Route courseURL={courseURL} path='/:courseID' component={Main} />
         <Route path="*" component={NotFoundView}/>
     </Route>

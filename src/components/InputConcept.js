@@ -3,6 +3,7 @@ import * as firebase from 'firebase'
 import { Input, Timeline, Col, Row, Button } from 'antd'
 import {getGradColor, toArray, getCookie} from '../utils'
 import Duration from './Duration'
+import Concept from './Concept'
 
 const InputConcept = React.createClass({
 	getInitialState: function(){
@@ -11,7 +12,6 @@ const InputConcept = React.createClass({
 			courseID: this.props.courseID,
 			conceptInputValue:'',
 			videoPlayerTime: this.props.getPlayedTime,
-			jumpToTime: this.props.jumpToTime,
 			user: getCookie('uid')
 		}
 	},
@@ -28,15 +28,28 @@ const InputConcept = React.createClass({
 			concepts: conceptsArray
 		})
 	},
-	handleConceptAdd: function(){
+	addConcept: function(){
 		const time = this.state.videoPlayerTime();
+		const minus_time = 3;
+		var played = time.played;
+		var duration = time.duration;
+		if(time.duration>minus_time){
+			played = time.played/time.duration * (time.duration-minus_time);
+			duration = time.duration-minus_time;
+		}
 		var key = this.fire.push({
 			word: this.state.conceptInputValue,
-			played: time.played,
-			time: time.duration
+			played: played,
+			time: duration
 		}).key;
 		firebase.database().ref(this.state.courseID+"/_concepts/"+this.state.user+'/'+key).update({id: key})
 		this.setState({conceptInputValue:''})
+	},
+	deleteConcept: function(id){
+		firebase.database().ref(this.state.courseID+"/_concepts/"+this.state.user+'/'+id).remove();
+	},
+	editConcept: function(id, content){
+		firebase.database().ref(this.state.courseID+"/_concepts/"+this.state.user+'/'+id).update({word:content});
 	},
 	handleConceptAggreagate: function(){
 		var me = this.state.user;
@@ -57,8 +70,16 @@ const InputConcept = React.createClass({
 			    	})
 			    }
 			    else { // if this is a new word
-			    	ref.update({id:concept['word']})
-			    	ref.child('_who').child(me).update({count:1})
+			    	var randomx = Math.floor(Math.random() * 501) - 250;
+					var randomy = Math.floor(Math.random() * 501) - 250;
+			    	ref.update({
+			    		id:concept['word'],
+			    		x: randomx,
+				    	y: randomy,
+			    	})
+			    	ref.child('_who').child(me).update({
+			    		count:1
+			    	})
 			    }
 			  });
 		})
@@ -71,14 +92,24 @@ const InputConcept = React.createClass({
 	render: function(){
 		return (
 			<div>
-				<div ref={t=>{this.conceptsContainer = t}} style={{maxHeight: '80%', overflowY: 'scroll'}}>
+				<div ref={t=>{this.conceptsContainer = t}} 
+					style={{padding:'10px', maxHeight: '80%', overflowY: 'scroll'}}>
 					{this.state.concepts.map((concept,index)=>{
-					return <Timeline.Item key={index} style={{cursor: 'pointer'}} onClick={()=>this.state.jumpToTime(concept.played)}> {concept.word} <Duration seconds={concept.time}/></Timeline.Item>
+					return  <Timeline.Item key={index}>
+								<Concept 
+									id={concept.id}
+									concept={concept.word}
+									time={concept.time}
+									played={concept.played}
+									jumpToTime={this.props.jumpToTime}
+									deleteConcept={this.deleteConcept}
+									editConcept={this.editConcept}/>
+							</Timeline.Item>
 					})}
 				</div>
 				<Row>
-					<Col span={20}><Input placeholder="New concept" onPressEnter={()=>this.handleConceptAdd()} value={this.state.conceptInputValue} onChange={this.handleConceptInputVlueChange}/></Col>
-					<Col span={4}><Button type="primary" onClick={()=>this.handleConceptAdd()}>Add</Button></Col>
+					<Col span={20}><Input placeholder="New concept" onPressEnter={()=>this.addConcept()} value={this.state.conceptInputValue} onChange={this.handleConceptInputVlueChange}/></Col>
+					<Col span={4}><Button type="primary" onClick={()=>this.addConcept()}>Add</Button></Col>
 				</Row>
 			</div>
 			)

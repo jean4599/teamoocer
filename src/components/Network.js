@@ -55,6 +55,7 @@ const ConceptMapping = React.createClass({
       		mode: 'nomal',
       		edgeLabelValue:'',
       		requests:[],
+      		nodeInitialized:false,
 		}
 	},
 	componentDidMount: function(){
@@ -161,18 +162,69 @@ const ConceptMapping = React.createClass({
 			network: network
 		})
 		network.enableEditMode()
+		// if(!this.state.nodeInitialized){
+		// 	//this.setNodeInitialPosition(network.getPositions(nodes.getIds()))
+		// 	this.setNodeInitialPosition(nodes.getIds());
+		//}
 	},
 	fitScreen: function(){
-		var fitnodes;
-		this.nodefire.once('value').then(function(snapshot){
-			fitnodes = snapshot.val();
-			fitnodes = Object.keys(fitnodes)
-			console.log(fitnodes)
-		})
+		var fitnodes = nodes.getIds();
 		network.fit({
 			nodes: fitnodes,
 			animation: false,
 		})
+	},
+	// setNodeInitialPosition: function(ids){
+	// 	// for (id in ids){
+	// 	// 	var x = ids[id].x;
+	// 	// 	var y = ids[id].y;
+	// 	// 	firebase.database().ref(this.state.courseID+"/_network/_concepts/"+id).update({
+	//  //    			x: x,
+	//  //    			y: y,
+	//  //    		})
+	// 	// }
+	// 	let requests = Object.keys(ids).map((id,index)=>{
+	// 		return new Promise((resolve, reject)=>{
+	// 			var x = ids[id].x;
+	// 			var y = ids[id].y;
+	// 			firebase.database().ref(this.state.courseID+"/_network/_concepts/"+id).update({
+	// 	    			x: x,
+	// 	    			y: y,
+	// 	    		})
+	// 		})
+	// 	})
+
+	// 	Promise.all(requests).then(()=>{
+	// 		console.log('remove physics')
+	// 		network.setOption({
+	// 			physics:{
+	// 				enabled:false,
+	// 			}
+	// 		}) 
+	// 	});
+	// 	this.setState({nodeInitialized:true})
+	// },
+	setNodeInitialPosition:function(ids){
+		console.log('try set node')
+		console.log(ids)
+		if(ids!=[]){
+			console.log('go set node')
+			this.setState({nodeInitialized:true})
+			var _ = this.state;
+			ids.map((id, index)=>{
+				firebase.database().ref(this.state.courseID+"/_network/_concepts/"+id+"/x").once('value',function(snapshot){
+					console.log('x='+snapshot.val())
+					if(!snapshot.val()){
+						var randomx = Math.floor(Math.random() * 501) - 250;
+						var randomy = Math.floor(Math.random() * 501) - 250;
+						firebase.database().ref(_.courseID+"/_network/_concepts/"+id).update({
+				    			x: randomx,
+				    			y: randomy,
+				    		})
+					}
+				})
+			})
+		}
 	},
 	handleEdgeLabelValueChange: function(e){
 		this.setState({
