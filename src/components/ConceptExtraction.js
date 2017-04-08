@@ -24,7 +24,7 @@ const ConceptExtraction = React.createClass ({
 		console.log(_.courseID) 
 		return(
 			<Row>
-				<Col span={16}><VideoPlayer courseURL={_.courseURL} controls={true} width={854} height={480} ref='player'/></Col>
+				<Col span={16} style={{minWidth: 854}}><VideoPlayer courseURL={_.courseURL} controls={true} width={854} height={480} ref='player'/></Col>
 				<Col span={8}>
 					<InputConcept ref={c=>{this.inputConcept=c}} courseID={_.courseID} getPlayedTime={this.getPlayedTime} jumpToTime={this.jumpToTime}/>
 					<Button type='primary' style={{marginTop: 10}} onClick={()=>this.conceptAggregation()}> Share these concepts </Button>

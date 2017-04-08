@@ -174,36 +174,6 @@ const ConceptMapping = React.createClass({
 			animation: false,
 		})
 	},
-	// setNodeInitialPosition: function(ids){
-	// 	// for (id in ids){
-	// 	// 	var x = ids[id].x;
-	// 	// 	var y = ids[id].y;
-	// 	// 	firebase.database().ref(this.state.courseID+"/_network/_concepts/"+id).update({
-	//  //    			x: x,
-	//  //    			y: y,
-	//  //    		})
-	// 	// }
-	// 	let requests = Object.keys(ids).map((id,index)=>{
-	// 		return new Promise((resolve, reject)=>{
-	// 			var x = ids[id].x;
-	// 			var y = ids[id].y;
-	// 			firebase.database().ref(this.state.courseID+"/_network/_concepts/"+id).update({
-	// 	    			x: x,
-	// 	    			y: y,
-	// 	    		})
-	// 		})
-	// 	})
-
-	// 	Promise.all(requests).then(()=>{
-	// 		console.log('remove physics')
-	// 		network.setOption({
-	// 			physics:{
-	// 				enabled:false,
-	// 			}
-	// 		}) 
-	// 	});
-	// 	this.setState({nodeInitialized:true})
-	// },
 	setNodeInitialPosition:function(ids){
 		console.log('try set node')
 		console.log(ids)

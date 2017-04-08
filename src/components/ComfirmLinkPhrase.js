@@ -36,9 +36,16 @@ const ComfirmLinkPhrase = React.createClass({
 	updateComfirmStatus:function(snapshot){
 		var me=this.state.user;
 		var result=snapshot.val();
+		var mycomfirmStatus = false;
+		if(result['requester']==me){
+			mycomfirmStatus = true;
+		}
+		else{
+			mycomfirmStatus = result[me].comfirm
+		}
 		if(result){
 			this.setState({
-				mycomfirmStatus: result[me].comfirm,
+				mycomfirmStatus: mycomfirmStatus,
 				allComfirmStatus: result,
 			})
 		}

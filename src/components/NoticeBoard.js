@@ -28,8 +28,11 @@ const NoticeBoard = React.createClass({
 		this.linkphraseFire.child(linkID).remove();
 	},
 	updateMembers: function(snapshot){
+		var members = toArray(snapshot.val())
+		members.splice(members.indexOf(this.state.user))
+
 		this.setState({
-			members: toArray(snapshot.val())
+			members: members
 		})
 	},
 	updateComfirmLinkPhrase: function(snapshot){
@@ -38,15 +41,20 @@ const NoticeBoard = React.createClass({
 	addComfirmLinkPhrase: function(linkID, requester){
 		console.log('NoticeBoard: addComfirmLinkPhrase '+linkID, requester)
 		var members = this.state.members;
-		this.linkphraseFire.child(linkID).update({
-			edge: linkID,
-			requester: requester
-		})
-		var i;
-		for (i=0; i<members.length; i++){
-			this.linkphraseFire.child(linkID).child(members[i].uid).update({
-				comfirm: false
+		if(members.length>0){
+			this.linkphraseFire.child(linkID).update({
+				edge: linkID,
+				requester: requester
 			})
+			var i;
+			for (i=0; i<members.length; i++){
+					this.linkphraseFire.child(linkID).child(members[i].uid).update({
+					comfirm: false
+				})
+			}
+		}
+		else{
+			this.props.changeEdgeToSolidLine(linkID)
 		}
 	},
   	render: function() {
