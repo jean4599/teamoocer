@@ -4,7 +4,7 @@ import thisstyle from './style.css'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import firebase from 'firebase'
-import {toArray, retrieveData} from '../utils'
+import {toArray, retrieveData, searchFromArrayObject} from '../utils'
 import {Row, Col, Button, Input, Dropdown, Menu, Icon, Card} from 'antd'
 	var options = {
 		  	physics:{
@@ -51,11 +51,14 @@ const ConceptMapping = React.createClass({
 		return {
 			courseID: this.props.courseID,
       		courseURL: this.props.courseURL,
+      		user: this.props.user,
       		data:{},
+      		concepts:[],
       		mode: 'nomal',
       		edgeLabelValue:'',
       		requests:[],
       		nodeInitialized:false,
+      		newConcept:''
 		}
 	},
 	componentDidMount: function(){
@@ -98,8 +101,12 @@ const ConceptMapping = React.createClass({
 		        }  
 	},
 	updateConcept: function(snapshot){
-		var retreiveLabel = ['id', 'id','color', 'x', 'y']
+		var retreiveLabel = ['id', 'label','color', 'x', 'y']
 		var containerLabel = ['id', 'label','color', 'x', 'y']
+		var concepts = toArray(snapshot.val())
+		this.setState({
+			concepts: concepts
+		})
 		nodes = retrieveData(snapshot.val(), retreiveLabel, containerLabel);
 		nodes = new vis.DataSet(nodes);
 		this.updateMap();
@@ -117,8 +124,6 @@ const ConceptMapping = React.createClass({
 		var prescale = null;
 		if(nodes!=[] && network!=null){
 			precenter = network.getViewPosition();
-			// console.log('the view position is');
-			// console.log(precenter)
 			prescale = network.getScale();
 		}
 		data={
@@ -143,10 +148,15 @@ const ConceptMapping = React.createClass({
 	    network.on("dragEnd", (params)=>{
 	    	var node = params['nodes'][0];
 	    	if(node){
-	    		firebase.database().ref(this.state.courseID+"/_network/_concepts/"+node).update({
+	    		var data = {
 	    			x: params['pointer']['canvas']['x'],
 	    			y: params['pointer']['canvas']['y'],
-	    		})
+	    		}
+	    		this.updateNode(node,data)
+	    		// firebase.database().ref(this.state.courseID+"/_network/_concepts/"+node).update({
+	    		// 	x: params['pointer']['canvas']['x'],
+	    		// 	y: params['pointer']['canvas']['y'],
+	    		// })
 	    	}
 	    	else{
 	    		console.log('Drag the map')
@@ -162,10 +172,6 @@ const ConceptMapping = React.createClass({
 			network: network
 		})
 		network.enableEditMode()
-		// if(!this.state.nodeInitialized){
-		// 	//this.setNodeInitialPosition(network.getPositions(nodes.getIds()))
-		// 	this.setNodeInitialPosition(nodes.getIds());
-		//}
 	},
 	fitScreen: function(){
 		var fitnodes = nodes.getIds();
@@ -175,15 +181,11 @@ const ConceptMapping = React.createClass({
 		})
 	},
 	setNodeInitialPosition:function(ids){
-		console.log('try set node')
-		console.log(ids)
 		if(ids!=[]){
-			console.log('go set node')
 			this.setState({nodeInitialized:true})
 			var _ = this.state;
 			ids.map((id, index)=>{
 				firebase.database().ref(this.state.courseID+"/_network/_concepts/"+id+"/x").once('value',function(snapshot){
-					console.log('x='+snapshot.val())
 					if(!snapshot.val()){
 						var randomx = Math.floor(Math.random() * 501) - 250;
 						var randomy = Math.floor(Math.random() * 501) - 250;
@@ -204,14 +206,37 @@ const ConceptMapping = React.createClass({
 	handleConceptInputChange: function(e){
 		this.setState({ newConcept: e.target.value})
 	},
-	saveNewNode:function(){
+	saveNewNode:function(concept,x,y){
 		//savedata into firebase
-		this.nodefire.child(this.state.newConcept).update({
-			id: this.state.newConcept,
-			word: this.state.newConcept,
-			x: this.state.newNodeData.x,
-			y: this.state.newNodeData.y
-		})
+		if(concept==undefined&&x==undefined&&y==undefined){
+			var concept = this.state.newConcept;
+			var x = this.state.newNodeData.x;
+			var y = this.state.newNodeData.y;
+		}
+		
+		if(concept){
+			console.log('Save new node ' + concept)
+			var search_result = searchFromArrayObject('label', concept, this.state.concepts)
+			if(search_result==''){
+				var key = this.nodefire.push({
+					label: concept,
+					x: x,
+					y: y
+				}).key;
+				this.nodefire.child(key).update({
+					id:key
+				})
+				this.nodefire.child(key+'/who/'+this.state.user).update({
+					count:1
+				})
+			}
+			else{
+				this.nodefire.child(search_result+'/who/'+this.state.user).update({
+					count:1
+				})
+			}
+		}
+
 		this.clearPopUp('addNode');
 	},
 	saveNewEdge:function(){
@@ -233,6 +258,13 @@ const ConceptMapping = React.createClass({
         if(node){
        		_this.nodefire.child(node).remove()    	
         }
+	},
+	updateNode: function(conceptID, data){
+		var nodekey = searchFromArrayObject('id', conceptID, this.state.concepts)
+		console.log('updateNode')
+		console.log(conceptID)
+		console.log(nodekey)
+		this.nodefire.child(nodekey).update(data)
 	},
 	clearPopUp:function(type){
 		if(type == 'addNode') this.setState({newConcept:'', displayAddNodePopup:'none'})

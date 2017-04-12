@@ -23,6 +23,7 @@ const ComfirmLinkPhrase = React.createClass({
 		this.comfirmStatusFire.on('value', this.updateComfirmStatus);
 		this.edgeFire=firebase.database().ref(this.state.courseID+'/_network/_edges/'+this.state.linkID)
 		this.edgeFire.on('value', this.updateEdgeData)
+		this.nodeFire=firebase.database().ref(this.state.courseID+'/_network/_concepts/')
 	},
 	componentDidUpdate: function(){
 		this.messageContainer.scrollTop = this.messageContainer.scrollHeight;
@@ -31,7 +32,22 @@ const ComfirmLinkPhrase = React.createClass({
 		this.setState({messages: toArray(snapshot.val()) });
 	},
 	updateEdgeData: function(snapshot){
-		this.setState({edge: snapshot.val()})
+		var edge = snapshot.val();
+		var from_node_id = edge.from;
+		var to_node_id = edge.to;
+		var from_node, to_node;
+		var _ = this
+		this.nodeFire.child(from_node_id).once('value').then(function(snapshot) {
+		  from_node = snapshot.val().label;
+		  edge.from_node = from_node;
+		  
+		  _.nodeFire.child(to_node_id).once('value').then(function(snapshot) {
+			  to_node = snapshot.val().label;
+			  edge.to_node = to_node;
+			  _.setState({edge: edge})
+			});
+		});
+		
 	},
 	updateComfirmStatus:function(snapshot){
 		var me=this.state.user;
@@ -96,9 +112,9 @@ const ComfirmLinkPhrase = React.createClass({
 	      		<Col span={6} className='comfirm-graph'> <p className='node left' /> </Col>
 	      	</Row>
 	      	<Row className='comfirm-graph-container text'>
-	      		<Col span={6} className='comfirm-graph'>{_.edge.from}</Col>
+	      		<Col span={6} className='comfirm-graph'>{_.edge.from_node}</Col>
 	      		<Col span={12} className='comfirm-graph'>{_.edge.label}</Col>
-	      		<Col span={6} className='comfirm-graph'>{_.edge.to}</Col>
+	      		<Col span={6} className='comfirm-graph'>{_.edge.to_node}</Col>
 	      	</Row>
 	      	<Row>
 	      		<div className='message-container' ref={container=>{this.messageContainer = container}}>

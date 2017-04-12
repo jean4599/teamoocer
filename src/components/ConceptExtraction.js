@@ -26,7 +26,12 @@ const ConceptExtraction = React.createClass ({
 			<Row>
 				<Col span={16}><VideoPlayer courseURL={_.courseURL} controls={true} width={854} height={480} ref='player'/></Col>
 				<Col span={8}>
-					<InputConcept ref={c=>{this.inputConcept=c}} courseID={_.courseID} getPlayedTime={this.getPlayedTime} jumpToTime={this.jumpToTime}/>
+					<InputConcept 
+						ref={c=>{this.inputConcept=c}}
+						courseID={_.courseID}
+						getPlayedTime={this.getPlayedTime}
+						jumpToTime={this.jumpToTime}
+						addConceptToNetwork={this.props.addConceptToNetwork}/>
 					<Button type='primary' style={{marginTop: 10}} onClick={()=>this.conceptAggregation()}> Share these concepts </Button>
 				</Col>
 			</Row>

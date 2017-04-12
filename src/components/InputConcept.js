@@ -54,34 +54,37 @@ const InputConcept = React.createClass({
 	handleConceptAggreagate: function(){
 		var me = this.state.user;
 		this.state.concepts.map((concept,index)=>{
-			var ref = firebase.database().ref(this.state.courseID+"/_network/_concepts/"+concept['word']);
-			ref.once('value')
-			  .then(function(snapshot) {
-			    // handle read data.
-			    var c = snapshot.val();
-			    if(c) { //if someone has created this word
-			    	ref.child('_who').child(me).update({count:1}).then(function(){//add myself
-			    		//update the node color
-				    	ref.child('_who').once('value').then(function(snapshot){ //check how many people
-				    		var people = toArray(snapshot.val());
-				    		var number = people.length;
-				    		ref.update({color: getGradColor(number)})
-				    	})
-			    	})
-			    }
-			    else { // if this is a new word
-			    	var randomx = Math.floor(Math.random() * 501) - 250;
-					var randomy = Math.floor(Math.random() * 501) - 250;
-			    	ref.update({
-			    		id:concept['word'],
-			    		x: randomx,
-				    	y: randomy,
-			    	})
-			    	ref.child('_who').child(me).update({
-			    		count:1
-			    	})
-			    }
-			  });
+			var randomx = Math.floor(Math.random() * 501) - 250;
+			var randomy = Math.floor(Math.random() * 501) - 250;
+			this.props.addConceptToNetwork(concept['word'], randomx, randomy)
+		// 	var ref = firebase.database().ref(this.state.courseID+"/_network/_concepts/"+concept['word']);
+		// 	ref.once('value')
+		// 	  .then(function(snapshot) {
+		// 	    // handle read data.
+		// 	    var c = snapshot.val();
+		// 	    if(c) { //if someone has created this word
+		// 	    	ref.child('_who').child(me).update({count:1}).then(function(){//add myself
+		// 	    		//update the node color
+		// 		    	ref.child('_who').once('value').then(function(snapshot){ //check how many people
+		// 		    		var people = toArray(snapshot.val());
+		// 		    		var number = people.length;
+		// 		    		ref.update({color: getGradColor(number)})
+		// 		    	})
+		// 	    	})
+		// 	    }
+		// 	    else { // if this is a new word
+		// 	    	var randomx = Math.floor(Math.random() * 501) - 250;
+		// 			var randomy = Math.floor(Math.random() * 501) - 250;
+		// 	    	ref.update({
+		// 	    		id:concept['word'],
+		// 	    		x: randomx,
+		// 		    	y: randomy,
+		// 	    	})
+		// 	    	ref.child('_who').child(me).update({
+		// 	    		count:1
+		// 	    	})
+		// 	    }
+		// 	  });
 		})
 	},
 	handleConceptInputVlueChange: function(e){

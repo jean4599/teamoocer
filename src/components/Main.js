@@ -25,13 +25,17 @@ const Main = React.createClass({
   	goDiscussion: function(){
   		this.conceptMapping.fitScreen();
   	},
+  	saveNewNode:function(concept,x,y){
+  		this.conceptMapping.saveNewNode(concept,x,y)
+  	},
 	render: function(){
 		var _ = this.state;
 		return (
 				<div>
 					<Element name="video" className="element">
 			          	<div style={{padding: '10 50', backgroundColor: '#e9e9e9', height: '80%' }}>
-			          		<ConceptExtraction ref={e=>{this.conceptExtraction=e}} courseURL={this.state.courseURL} courseID={this.state.courseID}/>
+			          		<ConceptExtraction ref={e=>{this.conceptExtraction=e}} courseURL={this.state.courseURL} courseID={this.state.courseID}
+			          			addConceptToNetwork={this.saveNewNode}/>
 			          	</div>
 			        </Element>
 

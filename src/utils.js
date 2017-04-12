@@ -7,7 +7,9 @@ export function toArray(obj) {
 
   var arr = Object.keys(obj).map(function (key, index) { 
     var result  = clone(obj[key]);
-    if(typeof(result)==Object)result.key = key
+    if(typeof(result)=='object'){
+      result.key = key
+    }
     return result; 
   });
   return arr
@@ -18,7 +20,6 @@ export function getMarks(obj, getkeys, values){
     var r_key=obj[key][getkeys].toFixed(2)
     var r_value=obj[key][values];
     if(result[r_key]!=null){
-      console.log(result[r_key]['value'])
       r_value = result[r_key]['value']+' ,'+ r_value;
     }
     result[r_key] = '';
@@ -59,6 +60,14 @@ export function getCookie(cname) {
     }
 export function getGradColor(scale){
   return GradColor[scale];
+}
+export function searchFromArrayObject(findkey, findvalue, myArray){
+    for (var i=0; i < myArray.length; i++) {
+        if (myArray[i][findkey] === findvalue) {
+            return myArray[i].key;
+        }
+    }
+    return '';
 }
 function clone(obj) {
     if (null == obj || "object" != typeof obj) return obj;

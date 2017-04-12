@@ -48,6 +48,9 @@ const ConceptMapping = React.createClass({
 	setMapView: function(x,y){
 		this.cursorPanel.setMapView(x,y)
 	},
+	saveNewNode: function(concept, x, y){
+		this.network.saveNewNode(concept,x,y)
+	},
 	render: function(){
 		var _ = this.state;
 		return(
@@ -73,6 +76,7 @@ const ConceptMapping = React.createClass({
 								ref={network=>{this.network=network}}
 								courseURL={_.courseURL} 
 								courseID={_.courseID}
+								user={_.user}
 								sendLinkPhraseNotice={this.sendLinkPhraseNotice}
 								changeMapView={this.setMapView} />
 						</ReactCursorPosition>
